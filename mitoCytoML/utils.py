@@ -8,6 +8,8 @@ Image.MAX_IMAGE_PIXELS = None
 from skimage import exposure, img_as_float
 from scipy.spatial.distance import cdist
 
+
+
 def images_list(directory):
     img_list = [f for f in
                 os.listdir(directory)
@@ -21,7 +23,8 @@ def contrast_stretching_quantiles(arr,plow,phigh):
     plower, phigher = np.percentile(arr, (plow, phigh))
     img_contrast_stretched = exposure.rescale_intensity(arr, in_range=(plower, phigher))
     return(img_contrast_stretched)
-def contrast_stretching_adap(img_as_float(channel), clip_limit=0.01):
+def contrast_stretching_adap(channel, clip_limit=0.01):
+    channel= img_as_float(channel)
     contrast_streched_channel = exposure.equalize_adapthist(img_as_float(memb_channel), clip_limit)
     return(contrast_streched_channel)
 def make_merge_channels(r,g):
@@ -33,7 +36,7 @@ def red_green_image_maker(r,g):
     return red_green_image
 
 def pixels_remover(pixel_mask,img):
-    pixels_removed_img= None
+    pixels_removed_img = img[pixel_mask==255] = 0
     
     return pixels_removed_img
 

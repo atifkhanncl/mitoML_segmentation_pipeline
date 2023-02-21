@@ -24,7 +24,7 @@ def get_unet_model(name='FR_model',directory= './model_FR/'):
     model = load_model(directory+name)
     return model
 def unet_predict(img):
-    model = def get_unet_model()
+    model = get_unet_model()
     img_norm= np.array(img)/255
     img_ready= np.expand_dims(img_norm,0)
     prediction = (model.predict(img_ready)[0,:,:,0] > 0.5).astype(np.uint8)
