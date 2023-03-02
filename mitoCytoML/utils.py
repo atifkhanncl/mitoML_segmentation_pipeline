@@ -23,9 +23,8 @@ def contrast_stretching_quantiles(arr,plow,phigh):
     plower, phigher = np.percentile(arr, (plow, phigh))
     img_contrast_stretched = exposure.rescale_intensity(arr, in_range=(plower, phigher))
     return(img_contrast_stretched)
-def contrast_stretching_adap(channel, clip_limit=0.01):
-    channel= img_as_float(channel)
-    contrast_streched_channel = exposure.equalize_adapthist(img_as_float(memb_channel), clip_limit)
+def contrast_stretching_adap(channel, c_limit=0.4):
+    contrast_streched_channel = exposure.equalize_adapthist( img_as_float(channel), clip_limit=c_limit)
     return(contrast_streched_channel)
 def make_merge_channels(r,g):
     b = np.zeros(r.shape)

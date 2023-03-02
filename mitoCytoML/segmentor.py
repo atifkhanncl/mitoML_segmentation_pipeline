@@ -9,7 +9,7 @@ class segmentor:
        
         self.membrane_channel = membrane_channel
         self.mass_channel = mass_channel
-        self.methods = ['fiber_segmentator',
+        self.methods = ['red_green_image_maker','fiber_segmentator',
                          'folded_region_segmentor', 'folded_region_remover',
                         'fiber_analysability_classifier','non_analysable_fibers_remover']
         self.red_green_image = None
@@ -21,6 +21,15 @@ class segmentor:
     def methods(self):
         
         return self.methods
+    
+    def red_green_image_maker(self):
+        
+        if self.red_green_image is None:
+            self.red_green_image = red_green_image_maker(self.membrane_channel, self.mass_channel)        
+        
+        return self.red_green_image
+    
+    
     def fiber_segmentator(self):
         
         if self.red_green_image is None:

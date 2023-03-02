@@ -9,8 +9,10 @@ from mitoCytoML.utils import dir_create, images_list
 raw_images_dir = "./raw_images/"
 mass_channel_dir= raw_images_dir+'/mass_channel_images/'
 membrane_channel_dir= raw_images_dir+'/membrane_channel_images/'
+red_green_images_dir= "./red_green_images"
 FR_removed_dir= "./FR_removed_RG_images/"
 raw_segmented_masks_dir ="./raw_segmented_masks/"
+FR_masks_dir= "./FR_masks"
 individual_fibers_dir ='./individual_fibers/'
 final_segmented_masks_dir= "./final_segmented_masks/"
 model_FR_dir = "./model_FR/"
@@ -26,8 +28,10 @@ class data_obj:
         self.raw_images_dir = raw_images_dir
         self.mass_channel_dir = mass_channel_dir
         self.membrane_channel_dir = membrane_channel_dir
+        self.red_green_images_dir = red_green_images_dir
         self.FR_removed_dir = FR_removed_dir
         self.raw_segmented_masks_dir = raw_segmented_masks_dir
+        self.FR_masks_dir = FR_masks_dir
         self.individual_fibers_dir = individual_fibers_dir
         self.final_segmented_masks_dir = final_segmented_masks_dir
         self.model_FR_dir = model_FR_dir
@@ -77,8 +81,10 @@ class data_obj:
         dir_create(raw_images_dir)
         dir_create(mass_channel_dir)
         dir_create(membrane_channel_dir)
+        dir_create(red_green_images_dir)
         dir_create(FR_removed_dir)
         dir_create(raw_segmented_masks_dir)
+        dir_create(FR_masks_dir)
         dir_create(individual_fibers_dir)
         dir_create(final_segmented_masks_dir)
         dir_create(model_FR_dir)
