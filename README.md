@@ -3,7 +3,7 @@ Machine learning pipeline to segment muscle fibers from IMC and IF images
 
 
 
-# Using Packagename
+# Using mitocytoML
 
 ## Getting Started
 
