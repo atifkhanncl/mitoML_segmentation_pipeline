@@ -32,7 +32,7 @@ Once finished
 deactivate
 ```
 
-## Extracting Metrics
+## Segmenting fibers
 
 mitocytoML can be utilised to segment muscle fibers from IMC and IF image data either just running 'mitoCytoML.py' or with 3 simple steps:
 
