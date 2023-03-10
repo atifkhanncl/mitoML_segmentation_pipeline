@@ -43,7 +43,7 @@ mitocytoML can be utilised to segment muscle fibers from IMC and IF image data e
 
 We handle the rest.
 
-### Synthetic Image Evaluator Example
+### mitoCytoML Fiber Segmentor Example
 
 Load in the segmentor object
 ```python
