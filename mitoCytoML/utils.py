@@ -15,23 +15,32 @@ def images_list(directory):
                 os.listdir(directory)
                 if os.path.isfile(os.path.join(directory, f))]
     return img_list
+
+def check_file_exist(file_path):
+    return os.path.isfile(file_path)
+
 def dir_create(path):
     if not os.path.exists(path):
         os.makedirs(path)
+
+def read_image(img_path):
+    img= cv2.imread(img_path,2)
+    return img
 def contrast_stretching_quantiles(arr,plow,phigh):
     arr =1.0 * arr #float
     plower, phigher = np.percentile(arr, (plow, phigh))
     img_contrast_stretched = exposure.rescale_intensity(arr, in_range=(plower, phigher))
     return(img_contrast_stretched)
-def contrast_stretching_adap(channel, c_limit=0.4):
-    contrast_streched_channel = exposure.equalize_adapthist( img_as_float(channel), clip_limit=c_limit)
+def contrast_stretching_adap(channel, c_limit=0.0001):
+    channel= img_as_float(channel)
+    contrast_streched_channel = exposure.equalize_adapthist(channel, clip_limit=c_limit)
     return(contrast_streched_channel)
 def make_merge_channels(r,g):
     b = np.zeros(r.shape)
-    rgb_uint8 = (np.dstack((r,g,b)) * 255.999) .astype(np.uint8) 
+    rgb_uint8 = (np.dstack((b,g,r))*255.999 ) .astype(np.uint8) 
     return rgb_uint8
-def red_green_image_maker(r,g):
-    red_green_image= make_merge_channels(contrast_stretching_adap(r),contrast_stretching_adap(g))
+def red_green_image_maker(r,g, c_limit_membrane=0.1, c_limit_mass=0.1 ):
+    red_green_image= make_merge_channels(contrast_stretching_adap(r, c_limit= c_limit_membrane),contrast_stretching_adap(g, c_limit= c_limit_mass ))
     return red_green_image
 
 def pixels_remover(pixel_mask,img):
@@ -39,6 +48,13 @@ def pixels_remover(pixel_mask,img):
     
     return pixels_removed_img
 
+def bbox2(img):
+    rows = np.any(img, axis=1)
+    cols = np.any(img, axis=0)
+    rmin, rmax = np.where(rows)[0][[0, -1]]
+    cmin, cmax = np.where(cols)[0][[0, -1]]
+
+    return rmin, rmax, cmin, cmax
 
 
 def ind_fiber_image_maker(rawim, maskim, filename,out_dir):

@@ -32,38 +32,43 @@ def get_unet_model(name='FR_model.hdf5',directory= './model_FR/'):
 
 def unet_predict(image, patch_size=512):
     step_size= math.gcd(patch_size, image.shape[0],image.shape[1])
-    #step_size=1
+    
     model = get_unet_model()
     patches = patchify(image, (patch_size, patch_size,3), step=step_size) 
     predicted_patches = []
     print(step_size)
     for i in range(patches.shape[0]):
         for j in range(patches.shape[1]):
-            single_patch = patches[i,j,:,:]
+            single_patch = np.squeeze(patches[i,j,:,:,:])
             #single_patch_norm = np.expand_dims(normalize(np.array(single_patch), axis=1),2)
+            print(single_patch.shape)
+            
+            
             single_patch_norm = np.array(single_patch)/255
             single_patch_input=np.expand_dims(single_patch_norm, 0)
+            
             single_patch_prediction = (model.predict(single_patch_input)[0,:,:,0] > 0.5).astype(np.uint8)
             predicted_patches.append(single_patch_prediction)
-            predicted_patches = np.array(predicted_patches)
-            predicted_patches_reshaped = np.reshape(predicted_patches, (patches.shape[0], patches.shape[1], patch_size,patch_size) )
-            segm_img = unpatchify(predicted_patches_reshaped, image.shape)
+            
+    predicted_patches = np.array(predicted_patches)
+    print(predicted_patches.shape)
+    predicted_patches_reshaped = np.reshape(predicted_patches, (patches.shape[0], patches.shape[1], patch_size,patch_size) )
+    segm_mask = unpatchify(predicted_patches_reshaped, (image.shape[0],image.shape[1]))
     
-    return segm_img
-#def unet_predict(img):
- #   model = get_unet_model()
-  #  img_norm= np.array(img)/255
-   # img_ready= np.expand_dims(img_norm,0)
-    #prediction = (model.predict(img_ready)[0,:,:,0] > 0.5).astype(np.uint8)
-    #return prediction
+    return segm_mask
 
 def get_classifier_model(name='classification_model',directory= './model_fiber_classification/'):
     model = keras.models.load_model(directory+name)
     return model
-def classifier_predict(ind_fiber_img):
+def classifier_predict(ind_fiber_array):
+    ind_fiber_array_scaled = ind_fiber_array/255.0
+    
+    
     model = get_classifier_model()
-    prediction = model.predict(ind_fiber_img)
+    input_img= np.expand_dims(ind_fiber_array_scaled, axis=0)
+    prediction = model.predict(input_img)
     prediction_NN = np.argmax(prediction, axis=-1)
-    prediction_NN = le.inverse_transform(prediction_NN)
+    
+    
     return prediction_NN
     
