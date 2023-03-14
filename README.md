@@ -9,9 +9,9 @@ Machine learning pipeline to segment muscle fibers from IMC and IF images
 
 ### Prerequisites
 
-Python 3.8 - 3.10  
+Python 3.8 or above
 
-*We highly recommand that uses the version between 3.8 and 3.10. With these versions, dependencies can be installed properly.
+*We highly recommand that uses the version 3.8 or above. With these versions, dependencies can be installed properly.
 
 
 ### Installation
@@ -34,7 +34,7 @@ deactivate
 
 ## Segmenting fibers
 
-mitocytoML can be utilised to segment muscle fibers from IMC and IF image data either just running 'mitoCytoML.py' or with 3 simple steps:
+mitocytoML can be utilised to segment muscle fibers from IMC and IF image data either just running 'main.py' or with 3 simple steps:
 
 1) Place raw images representing mass and membrane of the fibers in respective folders within 'raw_images' folder. 
 2) Load the mitocytoML `segmentor` and 'data' objects
