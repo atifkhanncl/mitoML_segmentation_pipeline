@@ -5,7 +5,7 @@ import cv2
 data_obj = data.data_obj ()
 data_obj.create_dir_structure()
 value = input("Please place required raw images into the respective folder then press 'y'")
-if value = 'y' or 'Y':
+if value == 'y' or 'Y':
     membrane_list, mass_list = data_obj.get_image_list()
     for infile in membrane_list:
         infile_mass_channel_path= os.path.join(data_obj.mass_channel_dir, infile)
