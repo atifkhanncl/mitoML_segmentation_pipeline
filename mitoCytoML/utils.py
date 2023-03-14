@@ -24,7 +24,7 @@ def dir_create(path):
         os.makedirs(path)
 
 def read_image(img_path):
-    img= cv2.imread(img_path,2)
+    img= cv2.imread(img_path,-1)
     return img
 def contrast_stretching_quantiles(arr,plow,phigh):
     arr =1.0 * arr #float
@@ -43,10 +43,11 @@ def red_green_image_maker(r,g, c_limit_membrane=0.1, c_limit_mass=0.1 ):
     red_green_image= make_merge_channels(contrast_stretching_adap(r, c_limit= c_limit_membrane),contrast_stretching_adap(g, c_limit= c_limit_mass ))
     return red_green_image
 
-def pixels_remover(pixel_mask,img):
-    pixels_removed_img = img[pixel_mask==255] = 0
+def pixels_remover(pixels_to_remove,from_img):
+    #pixels_removed_img = from_img[pixels_to_remove==255] = 0
+    from_img[pixels_to_remove == 255] = 0  
     
-    return pixels_removed_img
+    return from_img
 
 def bbox2(img):
     rows = np.any(img, axis=1)
@@ -57,7 +58,7 @@ def bbox2(img):
     return rmin, rmax, cmin, cmax
 
 
-def ind_fiber_image_maker(rawim, maskim, filename,out_dir):
+def ind_fiber_image_maker(rawim, maskim):
     maskarr = np.array(maskim,dtype=np.uint16)
     rawarr = np.array(rawim,dtype=np.uint8)
     unique_colours = np.unique(maskarr)
@@ -65,6 +66,7 @@ def ind_fiber_image_maker(rawim, maskim, filename,out_dir):
     end_column = maskarr.shape[1]
     # Discard black background
     unique_colours = [c for c in unique_colours if c!=0]
+    ind_fibers_list = []
     for colour in unique_colours:
         # Find pixels belonging to specific fibre
         fibmask = maskarr==colour
@@ -84,6 +86,8 @@ def ind_fiber_image_maker(rawim, maskim, filename,out_dir):
             fibmask2[fibmask2 ==colour] = 255
             # Delete any non-fibre pixels that remain in bounding box
             fibarr[np.logical_not(fibmask2)] = [0,0,0]
-            fibim = Image.fromarray(fibarr)
-            img_path = os.path.join(out_dir,filename+'_'+str(colour)+ '.tiff')
-            fibim.save(img_path)
+            ind_fibers_list.append(fibarr)
+            #fibim = Image.fromarray(fibarr)
+            #img_path = os.path.join(out_dir,filename+'_'+str(colour)+ '.tiff')
+            #fibim.save(img_path)
+    return ind_fibers_list, unique_colours

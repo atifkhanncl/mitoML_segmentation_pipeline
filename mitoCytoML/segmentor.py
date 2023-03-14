@@ -21,6 +21,7 @@ class segmentor:
         self.folded_region_mask = None
         self.fiber_analysability_mask = None
         self.folded_region_removed_fiber_mask = None
+        self.NA_FR_removed_fiber_mask = None
 
     def methods(self):
         
@@ -40,9 +41,9 @@ class segmentor:
     def fiber_segmentator(self):
         
         if self.red_green_image is None:
-            self.red_green_image = red_green_image_maker(self.membrane_channel, self.mass_channel)
+            self.red_green_image = self.red_green_image_maker()
         
-        fiber_mask = stardist_predict(self.red_green_image)
+        fiber_mask, details = stardist_predict(self.red_green_image)
         return fiber_mask
     
     def folded_region_segmentor(self):
@@ -59,24 +60,37 @@ class segmentor:
     def folded_region_remover(self):
         
         if self.red_green_image is None:
-            self.red_green_image = red_green_image_maker(self.membrane_channel, self.mass_channel)
+            self.red_green_image = self.red_green_image_maker()
         
         if self.folded_region_mask is None:
-            self.folded_region_mask = folded_region_segmentor(self.red_green_image)
+            self.folded_region_mask = self.folded_region_segmentor()
             
         if self.fiber_mask is None:
-            self.fiber_mask = fiber_segmentator(self.red_green_image) 
+            self.fiber_mask = self.fiber_segmentator() 
         
-        folded_region_removed_fiber_mask = pixels_remover(self.folded_region_mask, self.fiber_mask)
+        self.folded_region_removed_fiber_mask = pixels_remover(self.folded_region_mask, self.fiber_mask)
         
-        return folded_region_removed_fiber_mask
+        return self.folded_region_removed_fiber_mask
     
-    def fiber_analysability_classifier(self):        
-        return None
+    def fiber_analysability_classifier(self):
+        if self.fiber_mask is None:
+            self.fiber_mask = self.fiber_segmentator() 
+        if self.red_green_image is None:
+            self.red_green_image = self.red_green_image_maker()
+        
+        self.fiber_analysability_mask = classifier_predict(self.red_green_image,self.fiber_mask)
+        
+        return self.fiber_analysability_mask
     
     
     def non_analysable_fibers_remover(self):
-        return None
+        if self.folded_region_removed_fiber_mask is None:
+            self.folded_region_removed_fiber_mask = self.folded_region_remover() 
+        if self.fiber_analysability_mask is None:
+            self.fiber_analysability_mask = self.fiber_analysability_classifier() 
+        
+        self.NA_FR_removed_fiber_mask = pixels_remover(self.fiber_analysability_mask, self.folded_region_removed_fiber_mask)
+        return self.NA_FR_removed_fiber_mask
     
         
     

@@ -10,10 +10,10 @@ raw_images_dir = "./raw_images/"
 mass_channel_dir= raw_images_dir+'/mass_channel_images/'
 membrane_channel_dir= raw_images_dir+'/membrane_channel_images/'
 red_green_images_dir= "./red_green_images"
-FR_removed_dir= "./FR_removed_RG_images/"
+FR_removed_dir= "./FR_removed_fiber_mask/"
 raw_segmented_masks_dir ="./raw_segmented_masks/"
 FR_masks_dir= "./FR_masks"
-individual_fibers_dir ='./individual_fibers/'
+NA_fibers_dir ='./NA_fibers/'
 final_segmented_masks_dir= "./final_segmented_masks/"
 model_FR_dir = "./model_FR/"
 model_segmentation_dir= "./model_fiber_segmentation/"
@@ -32,7 +32,7 @@ class data_obj:
         self.FR_removed_dir = FR_removed_dir
         self.raw_segmented_masks_dir = raw_segmented_masks_dir
         self.FR_masks_dir = FR_masks_dir
-        self.individual_fibers_dir = individual_fibers_dir
+        self.NA_fibers_dir = NA_fibers_dir
         self.final_segmented_masks_dir = final_segmented_masks_dir
         self.model_FR_dir = model_FR_dir
         self.model_segmentation_dir =model_segmentation_dir
@@ -60,7 +60,7 @@ class data_obj:
     def raw_segmented_masks_dir(self):
         return self.raw_segmented_masks_dir
     
-    def individual_fibers_dir(self):
+    def NA_fibers_dir(self):
         return self.individual_fibers_dir
     
     def final_segmented_masks_dir(self):
@@ -85,7 +85,7 @@ class data_obj:
         dir_create(FR_removed_dir)
         dir_create(raw_segmented_masks_dir)
         dir_create(FR_masks_dir)
-        dir_create(individual_fibers_dir)
+        dir_create(NA_fibers_dir)
         dir_create(final_segmented_masks_dir)
         dir_create(model_FR_dir)
         dir_create(model_segmentation_dir)
