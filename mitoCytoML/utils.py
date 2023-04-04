@@ -5,8 +5,9 @@ import os
 import cv2
 import csv
 Image.MAX_IMAGE_PIXELS = None
-from skimage import exposure, img_as_float
+from skimage import exposure, img_as_float,img_as_uint
 from scipy.spatial.distance import cdist
+from csbdeep.utils import normalize
 
 
 
@@ -24,24 +25,54 @@ def dir_create(path):
         os.makedirs(path)
 
 def read_image(img_path):
-    img= cv2.imread(img_path,-1)
-    return img
-def contrast_stretching_quantiles(arr,plow,phigh):
-    arr =1.0 * arr #float
-    plower, phigher = np.percentile(arr, (plow, phigh))
-    img_contrast_stretched = exposure.rescale_intensity(arr, in_range=(plower, phigher))
-    return(img_contrast_stretched)
-def contrast_stretching_adap(channel, c_limit=0.0001):
+    img_BGR= cv2.imread(img_path,-1)
+    #img_RGB=cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)
+    return img_BGR
+
+def contrast_stretching_quantiles(channel,plow,phigh):
     channel= img_as_float(channel)
-    contrast_streched_channel = exposure.equalize_adapthist(channel, clip_limit=c_limit)
+    plower, phigher = np.percentile(channel, (plow, phigh))
+    img_contrast_stretched = img_as_uint(exposure.rescale_intensity(channel, in_range=(plower, phigher)))
+    return(img_contrast_stretched)
+
+def contrast_stretching_adap(channel, c_limit):
+    channel= img_as_float(channel)
+    contrast_streched_channel = img_as_uint(exposure.equalize_adapthist(channel, clip_limit=c_limit))
     return(contrast_streched_channel)
+
+def image_normalizer(img):
+    axis_norm = (0,1)
+    img_norm = normalize(img, 1.0,99.8, axis=axis_norm)
+    return img_norm
+
 def make_merge_channels(r,g):
     b = np.zeros(r.shape)
     rgb_uint8 = (np.dstack((b,g,r))*255.999 ) .astype(np.uint8) 
     return rgb_uint8
-def red_green_image_maker(r,g, c_limit_membrane=0.1, c_limit_mass=0.1 ):
-    red_green_image= make_merge_channels(contrast_stretching_adap(r, c_limit= c_limit_membrane),contrast_stretching_adap(g, c_limit= c_limit_mass ))
+
+def makepseudo(arr,minpercent=5,maxpercent=95):
+    minval,maxval = np.percentile(arr.flatten(),[minpercent,maxpercent])
+    if(maxval>minval):
+        arr = np.maximum(np.minimum(arr,maxval),minval)
+        arr = arr-minval
+        arrf = np.array(arr,dtype=np.float32)
+        arrf = np.array(np.round(255.0*np.minimum(1.0,arrf/(maxval-minval))),dtype=np.uint8)
+    else:
+        arrf = np.array(arr[:,:],dtype=np.uint8)
+    return(arrf)
+
+def make_merge_channels_16bit(r,g):
+    b = np.zeros(r.shape)
+    bgr_uint16 = (np.dstack((b,g,r)) ) .astype(np.uint16) 
+    return bgr_uint16
+
+def red_green_image_maker(r,g ):
+    red_green_image= make_merge_channels_16bit(makepseudo(r),makepseudo(g))
     return red_green_image
+
+def red_green_image_maker_without_contrast(r,g):
+    red_green_img_no_contrasting = make_merge_channels_16bit(r,g)
+    return red_green_img_no_contrasting
 
 def pixels_remover(pixels_to_remove,from_img):
     #pixels_removed_img = from_img[pixels_to_remove==255] = 0

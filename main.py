@@ -17,8 +17,8 @@ if value == 'y' or 'Y':
         outfile_path_NA_mask= os.path.join(data_obj.NA_fibers_dir, infile)
         outfile_path_final_segmented_masks= os.path.join(data_obj.final_segmented_masks_dir, infile)
         
-        mass_img= cv2.imread(infile_mass_channel_path,2)
-        membrane_img= cv2.imread(infile_membrane_channel_path,2)
+        mass_img= cv2.imread(infile_mass_channel_path,-1)
+        membrane_img= cv2.imread(infile_membrane_channel_path,-1)
         
         segmentor_obj = segmentor.segmentor(membrane_img, mass_img,outfile_path_red_green,outfile_path_folded_region)
         

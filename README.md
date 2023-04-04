@@ -16,25 +16,18 @@ Python 3.8 or above
 
 ### Installation
 
-After cloning the repo into a new directory, make a virtual environment called 'venv', activate it, and install the dependencies using pip tool, e.g.
+After cloning the repo into a new directory, install dependencies
 
 ``` shell
-python3 -m venv venv
-source venv/bin/activate
 pip install -r requirements.txt
 ```
 
 **Note: the requirements file contains all the dependencies needed, and it works well when the version of python is in the mentioned range.**
 
-Once finished   
-
-```
-deactivate
-```
 
 ## Segmenting fibers
 
-mitocytoML can be utilised to segment muscle fibers from IMC and IF image data either just running 'main.py' or with 3 simple steps:
+mitocytoML can be utilised to segment muscle fibers from IMC and IF image data either by just running 'main.py' or with 3 simple steps:
 
 1) Place raw images representing mass and membrane of the fibers in respective folders within 'raw_images' folder. 
 2) Load the mitocytoML `segmentor` and 'data' objects
@@ -42,6 +35,10 @@ mitocytoML can be utilised to segment muscle fibers from IMC and IF image data e
 
 
 We handle the rest.
+
+## Viewing the resulted images and masks
+
+we encourage you use [napari] (https://napari.org/stable/) to view results.
 
 ### mitoCytoML Fiber Segmentor Example
 

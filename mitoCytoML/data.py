@@ -21,9 +21,25 @@ model_classification_dir= "./model_fiber_classification/"
 
 
 class data_obj:
-   
+    """
+    The class data, used to create directory structure.
+        Parameters:
+            None
+        Methods:
+            metrics():
+                Provides all data methods implemented.
+            
+    """
 
     def __init__(self):
+        
+        """
+         Constructs all the necessary attributes to create an data_obj.
+            Parameters:
+                None
+            Returns:
+                None
+        """
        
         self.raw_images_dir = raw_images_dir
         self.mass_channel_dir = mass_channel_dir
@@ -77,6 +93,14 @@ class data_obj:
      
        
     def create_dir_structure(self):
+        
+        """
+        Creates all directories required.
+            Paremeters:
+                None
+            Returns:
+                None
+        """
         
         dir_create(raw_images_dir)
         dir_create(mass_channel_dir)

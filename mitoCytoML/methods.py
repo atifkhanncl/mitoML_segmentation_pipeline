@@ -1,24 +1,28 @@
 from mitoCytoML.utils import *
 from stardist.models import StarDist2D
-from csbdeep.utils import Path, normalize
+from stardist import fill_label_holes
+from csbdeep.utils import Path, normalize, axes_check_and_normalize
 from tensorflow import keras
 from keras_unet_collection import models, losses
 from keras.models import load_model
 import numpy as np
 import cv2
+import imutils
 
 
 
 def get_stardist_model(model_name='stardist_model',directory= './model_fiber_segmentation/'):
     model = StarDist2D(None, name=model_name, basedir=directory)
     return model
-def stardist_predict(img):
+def stardist_predict(img_BGR):
+    img = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)   
     model = get_stardist_model()
     axis_norm = (0,1)
     img_norm = normalize(img, 1,99.8, axis=axis_norm)
     labels, details = model.predict_instances(img_norm)
     return labels, details
-def stardist_predict_with_class(img):
+def stardist_predict_with_class(img_BGR):
+    img = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)
     model = get_stardist_model()
     axis_norm = (0,1)
     img_norm = normalize(img, 1,99.8, axis=axis_norm)
@@ -30,9 +34,9 @@ def get_unet_model(name='FR_model.hdf5',directory= './model_FR/'):
     model = keras.models.load_model(directory+name , custom_objects={"dice_coef": losses.dice_coef })
     return model
 
-def unet_predict(image, patch_size=512):
+def unet_predict(img, patch_size=512):
     model = get_unet_model()
-    
+    image = img.astype(np.uint8) 
     segm_img = np.zeros(image.shape[:2])  #Array with zeros to be filled with segmented values
   
     for i in range(0, image.shape[0], patch_size):   
@@ -77,6 +81,19 @@ def unet_predict(image, patch_size=512):
    
     
     return segm_mask
+
+def process_folded_region_masks(img, contour_area_low_limit=18000):
+    folded_regions_mask_= unet_predict(img)
+    folded_regions_mask= fill_label_holes(folded_regions_mask_)
+    cnts = cv2.findContours(folded_regions_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cnts[1] if imutils.is_cv3() else cnts[0]
+    for c in cnts:
+        (x, y, w, h) = cv2.boundingRect(c)
+        cnt_area = w * h
+        if cnt_area < contour_area_low_limit:
+            folded_regions_mask[y:y + h, x:x + w] = 0
+    return folded_regions_mask
+    
 
 def get_classifier_model(name='classification_model',directory= './model_fiber_classification/'):
     model = keras.models.load_model(directory+name)
