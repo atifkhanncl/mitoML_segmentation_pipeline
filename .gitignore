@@ -1,0 +1,9 @@
+
+*.pyc
+*.pyc
+model_FR/FR_model.hdf5
+NA_fibers/P02.tiff
+raw_segmented_masks/P02.tiff
+FR_removed_fiber_mask/P02.tiff
+FR_masks/P02.tiff
+final_segmented_masks/P02.tiff
