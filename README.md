@@ -11,7 +11,7 @@ Machine learning pipeline to segment muscle fibers from IMC and IF images
 
 Python 3.8 or above
 
-*We highly recommand that uses the version > 3.9 <3.10 . With these versions, dependencies can be installed properly.
+*We highly recommand using the version > 3.9 <3.10 . With these versions, dependencies can be installed properly.
 
 
 ### Installation
