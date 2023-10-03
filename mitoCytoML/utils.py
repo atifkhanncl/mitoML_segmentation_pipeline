@@ -84,6 +84,10 @@ def pixels_remover(pixels_to_remove,from_img):
     from_img[pixels_to_remove == 255] = 0  
     
     return from_img
+def give_blank_mask(mask):    
+    blank= np.zeros(mask.shape[0:2]).astype(np.uint16)
+    return blank
+
 
 def bbox2(img):
     rows = np.any(img, axis=1)
@@ -211,7 +215,7 @@ def mask_selected_fibers_array_retain (mask_proper, fibres_to_retain_array):
                        
     return mask_to_return
 
-def from_mask_to_remove_mak (mask_proper, mask_remove):
+def from_mask_to_remove_mask (mask_proper, mask_remove):
     
     
     

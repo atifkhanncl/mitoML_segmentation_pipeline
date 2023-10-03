@@ -32,6 +32,7 @@ if value == 'y' or 'Y':
         outfile_path_final_segmented_mask= os.path.join(data_obj.final_segmented_masks_dir, infile)
         
         outfile_path_metrics= os.path.join(data_obj.metrics_dir, infile.split('.')[0]+'.csv')
+        outfile_path_fiber_metrics= os.path.join(data_obj.metrics_dir, infile.split('.')[0]+'_perFiber.csv')
         
         mass_img= cv2.imread(infile_mass_channel_path,-1)
         membrane_img= cv2.imread(infile_membrane_channel_path,-1)
@@ -48,8 +49,9 @@ if value == 'y' or 'Y':
         cv2.imwrite(outfile_path_raw_segmented_masks_cellpose,fiber_mask_cellpose)
         
           
-        NTM_mask = segmentor_obj.NTM_mask_maker()
+        NTM_mask, fiber_metrics = segmentor_obj.NTM_mask_maker()
         cv2.imwrite(outfile_path_NTM_mask ,NTM_mask)
+        np.savetxt(outfile_path_fiber_metrics,fiber_metrics,delimiter=",")
         NTM_removed_mask = segmentor_obj.NTM_remover()
         cv2.imwrite(outfile_path_NTM_removed_mask ,NTM_removed_mask)
         
@@ -66,11 +68,11 @@ if value == 'y' or 'Y':
       
         
         final_segmented_masks = segmentor_obj.non_analysable_fibers_remover()
-        cv2.imwrite(outfile_path_final_segmented_masks ,final_segmented_masks)
+        cv2.imwrite(outfile_path_final_segmented_mask ,final_segmented_masks)
         
         if manual_mask is not None:
             metrics_array= segmentor_obj.metrics_calculator()
-            np.savetext(outfile_path_metrics,metrics_array, delimiter=",")
+            np.savetxt(outfile_path_metrics,metrics_array, delimiter=",")
             
             
         

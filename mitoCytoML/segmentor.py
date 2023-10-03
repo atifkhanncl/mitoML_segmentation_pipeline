@@ -51,6 +51,7 @@ class segmentor:
         self.folded_region_mask = None
         self.folded_region_removed_fiber_mask = None
         self.curated_fiber_mask = None
+        self.fiber_metrics = None
         
         
 
@@ -128,9 +129,9 @@ class segmentor:
             if check_file_exist(self.NTM_mask_path):
                 self.NTM_mask= read_image(self.NTM_mask_path)
             else:
-                self.NTM_mask = get_NTM_mask(self.fiber_mask)
+                self.NTM_mask, self.fiber_metrics = get_NTM_mask(self.fiber_mask)
         
-        return self.NTM_mask
+        return self.NTM_mask, self.fiber_metrics
     
     
     def NTM_remover(self):
@@ -139,8 +140,8 @@ class segmentor:
         if self.fiber_mask is None:
             self.fiber_mask = self.fiber_segmentator() 
         if self.NTM_mask is None:
-            self.NTM_mask = self.NTM_mask_maker() 
-        self.NTM_removed_mask= from_mask_to_remove_mak (self.fiber_mask,self.NTM_mask)
+            self.NTM_mask, self.fiber_metrics = self.NTM_mask_maker() 
+        self.NTM_removed_mask= from_mask_to_remove_mask (self.fiber_mask,self.NTM_mask)
         
         
         return self.NTM_removed_mask
@@ -175,7 +176,7 @@ class segmentor:
             self.fiber_mask = self.fiber_segmentator() 
         if self.FAM_mask is None:
             self.FAM_mask = self.FAM_mask_maker() 
-        self.FAM_removed_mask= from_mask_to_remove_mak (self.fiber_mask,self.FAM_mask)
+        self.FAM_removed_mask= from_mask_to_remove_mask (self.fiber_mask,self.FAM_mask)
         
         
         return self.FAM_removed_mask
@@ -194,10 +195,11 @@ class segmentor:
             self.red_green_image = self.red_green_image_maker()
             
         if self.folded_region_mask is None:
-            if check_file_exist(self.folded_region_mask_path):
-                self.folded_region_mask= read_image(self.folded_region_mask_path)
+            if check_file_exist(self.FR_mask_path):
+                self.folded_region_mask= read_image(self.FR_mask_path)
             else:
-                self.folded_region_mask= process_folded_region_masks(self.red_green_image)
+                #self.folded_region_mask= process_folded_region_masks(self.red_green_image)
+                self.folded_region_mask=give_blank_mask(self.red_green_image)
              
         return self.folded_region_mask
     
@@ -217,7 +219,7 @@ class segmentor:
         if self.fiber_mask is None:
             self.fiber_mask = self.fiber_segmentator() 
         
-        self.folded_region_removed_fiber_mask = pixels_remover(self.folded_region_mask, self.fiber_mask)
+        self.folded_region_removed_fiber_mask = from_mask_to_remove_mask( self.fiber_mask, self.folded_region_mask)
         
         return self.folded_region_removed_fiber_mask
     
@@ -245,8 +247,8 @@ class segmentor:
             self.FAM_mask = self.FAM_mask_maker() 
         if self.folded_region_mask is None:
             self.folded_region_mask = self.folded_region_segmentor()
-        remove_NTM= from_mask_to_remove_mak (self.fiber_mask,self.NTM_mask)
-        remove_FAM_NTM= from_mask_to_remove_mak (remove_NTM,self.FAM_mask)
+        remove_NTM= from_mask_to_remove_mask (self.fiber_mask,self.NTM_mask)
+        remove_FAM_NTM= from_mask_to_remove_mask (remove_NTM,self.FAM_mask)
         self.curated_fiber_mask = pixels_remover(self.folded_region_mask, remove_FAM_NTM)
         return self.curated_fiber_mask
     

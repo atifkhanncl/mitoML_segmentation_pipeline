@@ -7,6 +7,8 @@ from csbdeep.utils import Path, normalize, axes_check_and_normalize
 from tensorflow import keras
 from keras_unet_collection import models, losses
 from keras.models import load_model
+from keras.applications.vgg16 import VGG16
+import xgboost as xgb
 import numpy as np
 import cv2
 import imutils
@@ -70,7 +72,7 @@ def cellpose_predict(img_BGR, primary_channel='Green', secondary_channel='Red', 
     
     
 
-def get_unet_model(name='FR_model.hdf5',directory= '.models/model_FR/'):
+def get_unet_model(name='FR_model.hdf5',directory= './models/model_FR/'):
     model = keras.models.load_model(directory+name , custom_objects={"dice_coef": losses.dice_coef })
     return model
 
@@ -134,11 +136,11 @@ def process_folded_region_masks(img, contour_area_low_limit=18000):
             folded_regions_mask[y:y + h, x:x + w] = 0
     return folded_regions_mask
 
-
+   
 
 def NTM_identification_logic(fiber_area,fiber_on_border,fiber_convexity,fiber_lengthSquardedByArea,fiber_aspect_ratio):
     return_flag= True
-    if fiber_area>210 & fiber_area<27000 & fiber_on_border== False & fiber_convexity<1.19 & fiber_lengthSquardedByArea < 3.10:
+    if fiber_area>210 and fiber_area<27000 and fiber_on_border is False and fiber_convexity<1.19 and fiber_lengthSquardedByArea < 3.10 and (not(fiber_aspect_ratio>2.2 and fiber_lengthSquardedByArea>1.8)):
         return_flag= False
         
     return return_flag
@@ -151,7 +153,7 @@ def get_NTM_mask(instance_mask):
     NTM_fibre_ids=[]
     fiber_areas_with_ids= fiber_areas(mask)
     list_of_fiber_ids= list(fiber_areas_with_ids.keys())
-    
+    fiber_metrics=[]
     for fiber_id in list_of_fiber_ids:
         individual_fiber_mask= np.array(((mask == fiber_id)*255),dtype=np.uint8) 
         fib_area= fiber_areas_with_ids[fiber_id]
@@ -159,21 +161,32 @@ def get_NTM_mask(instance_mask):
         fib_convexity= fiber_convexity(individual_fiber_mask, fib_area)
         fib_aspect_ratio= fiber_aspect_ratio(individual_fiber_mask)
         fib_lengthSquardedByArea= fiber_lengthSquaredbyArea_bbox(individual_fiber_mask, fib_area)
+        fiber_metrics.append((fib_area,fib_on_border,fib_convexity,fib_lengthSquardedByArea,fib_aspect_ratio))
         
         if NTM_identification_logic(fib_area,fib_on_border,fib_convexity,fib_lengthSquardedByArea,fib_aspect_ratio):
             NTM_fibre_ids.append(fiber_id)
-    NTM_mask= mask_selected_fibers_array_retain (mask, np.array(NTM_fibre_id))
+    NTM_mask= mask_selected_fibers_array_retain (mask, np.array(NTM_fibre_ids))
     #Non_NTM_mask= mask_selected_fibers_array_remove (mask, NTM_fibre_ids.to_numpy())
     
-    return NTM_mask
+    return NTM_mask,fiber_metrics
     
+def get_VGG16_features(scaled_img, SIZE=128):
+    VGG_model = VGG16(weights='imagenet', include_top=False, input_shape=(SIZE, SIZE, 3))
+    for layer in VGG_model.layers:
+        layer.trainable = False
+    
+    predicted_features= VGG_model.predict(scaled_img)
+    predicted_features= predicted_features.reshape(predicted_features.shape[0], -1)
+    
+    return predicted_features
 
-
-def get_FAM_classifier(name='FAM_classifier',directory= './models/model_FAM_classification/'):
-    model = keras.models.load_model(directory+name)
+def get_FAM_classifier(name='xgBoost.json',directory= './models/model_FAM_classification/FAM_classifier/'):
+    model = xgb.XGBClassifier()
+    model.load_model(directory+name)
+    return model
     
     return model
-def get_FAM_mask(img, fiber_mask):
+def get_FAM_mask(img, fiber_mask, SIZE=128):
     fib_mask= np.copy(fiber_mask)
     ind_fiber_list, unique_colours= ind_fiber_image_maker(img, fib_mask)
     model = get_FAM_classifier()
@@ -182,11 +195,14 @@ def get_FAM_mask(img, fiber_mask):
     #NA_mask= np.zeros(fib_mask.shape,dtype=np.uint8)
     #NA_mask_255 = np.zeros(fib_mask.shape,dtype=np.uint8)
     for img, unique_colour in zip(ind_fiber_list, unique_colours):
-        img = cv2.resize(img,dsize=(128,128), interpolation=cv2.INTER_CUBIC)
+        img = cv2.resize(img,(SIZE,SIZE))
         img_scaled = img/255.0
         input_img= np.expand_dims(img_scaled, axis=0)
-        prediction = np.argmax( model.predict(input_img))
-        if prediction > 0:
+        input_img_features = get_VGG16_features(input_img, SIZE)
+        model=  get_FAM_classifier()
+        prediction = model.predict(input_img_features)[0]
+        
+        if prediction == 0:
             FAM_ids.append(unique_colour)
     
     FAM_mask= mask_selected_fibers_array_retain (fib_mask, np.array(FAM_ids))

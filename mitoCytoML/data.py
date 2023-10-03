@@ -19,10 +19,10 @@ raw_segmented_masks_stardist_dir ="./output/Step_1/raw_segmented_masks/stardist"
 raw_segmented_masks_cellpose_dir ="./output/Step_1/raw_segmented_masks/cellpose"
 
 NTM_masks_dir ='./output/Step_2A/NTM_masks/'
-NTM_removed_masks_dir ='./output/Step_2A/NTM_masks/'
+NTM_removed_masks_dir ='./output/Step_2A/NTM_removed_masks/'
 
 FAM_masks_dir ='./output/Step_2B/FAM_masks/'
-FAM_removed_masks_dir ='./output/Step_2B/FAM_masks/'
+FAM_removed_masks_dir ='./output/Step_2B/FAM_removed_masks/'
 
 FR_masks_dir= "./output/Step_3/FR_masks"
 FR_removed_dir= "./output/Step_3/FR_removed_fiber_mask/"
