@@ -36,4 +36,4 @@ input/raw_images/membrane_channel_images/MCD001_MDP_C09-10_B_A0_MP_MF0_S00_RR006
 input/raw_images/membrane_channel_images/MCD001_MDP_C09-10_B_A0_MP_MF0_S00_RR006_C10_B0_DMD.tiff
 *.pyc
 *.pyc
-output/red_green_images/MCD001_MDP_C09-10_B_A0_MP_MF0_S00_RR001_C09_B0.tiff
+output/*
