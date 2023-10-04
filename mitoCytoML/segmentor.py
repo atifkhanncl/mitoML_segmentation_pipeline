@@ -15,7 +15,7 @@ class segmentor:
             
     """
 
-    def __init__(self,membrane_channel, mass_channel, red_green_file_path, fiber_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path, metrics_path):
+    def __init__(self,membrane_channel, mass_channel,manual_mask, red_green_file_path, fiber_mask_path,stardist_mask_path,cellpose_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path):
         
         """
          Constructs all the necessary attributes to create an Segmentor.
@@ -28,18 +28,20 @@ class segmentor:
         """       
         self.membrane_channel = membrane_channel
         self.mass_channel = mass_channel
+        self.manual_mask= manual_mask
         self.c_limit_membrane = 0.1
         self.c_limit_mass = 0.4
         self.red_green_file_path = red_green_file_path
         self.fiber_mask_path = fiber_mask_path
+        self.stardist_mask_path= stardist_mask_path
+        self.cellpose_mask_path=cellpose_mask_path
         self.NTM_mask_path = NTM_mask_path
         self.FAM_mask_path = FAM_mask_path       
         self.FR_mask_path = FR_mask_path
         self.final_mask_path = final_mask_path
-        self.metrics_path = metrics_path
         self.methods = ['red_green_image_maker','fiber_segmentator','NTM_mask_maker','NTM_remover','FAM_mask_maker','FAM_remover',
                          'folded_region_segmentor', 'folded_region_remover',
-                        'non_analysable_fibers_remover']
+                        'non_analysable_fibers_remover', 'quality_metrics_calculator']
         self.red_green_image = None
         self.fiber_mask = None
         self.fiber_mask_stardist = None
@@ -52,6 +54,7 @@ class segmentor:
         self.folded_region_removed_fiber_mask = None
         self.curated_fiber_mask = None
         self.fiber_metrics = None
+        self.quality_metrics = None
         
         
 
@@ -102,6 +105,10 @@ class segmentor:
         if self.fiber_mask is None:
             if check_file_exist(self.fiber_mask_path):
                 self.fiber_mask= read_image(self.fiber_mask_path)
+                self.fiber_mask_stardist= read_image(self.stardist_mask_path)
+                self.fiber_mask_cellpose= read_image(self.cellpose_mask_path)
+                
+                
             else:
                 self.fiber_mask_stardist, details = stardist_predict(self.red_green_image)
                 self.fiber_mask_cellpose = cellpose_predict(self.red_green_image)
@@ -249,8 +256,26 @@ class segmentor:
             self.folded_region_mask = self.folded_region_segmentor()
         remove_NTM= from_mask_to_remove_mask (self.fiber_mask,self.NTM_mask)
         remove_FAM_NTM= from_mask_to_remove_mask (remove_NTM,self.FAM_mask)
-        self.curated_fiber_mask = pixels_remover(self.folded_region_mask, remove_FAM_NTM)
+        self.curated_fiber_mask = from_mask_to_remove_mask (remove_FAM_NTM,self.folded_region_mask)
         return self.curated_fiber_mask
+    
+    
+    def quality_metrics_calculator(self):
+        
+        """
+        Calculates quality metrics between manual annotation and prediction .
+            Paremeters:
+                None
+            Returns:
+                self.quality_metrics: An nd array of all quality metrics .
+        """
+        if self.red_green_image is None:
+            self.red_green_image = self.red_green_image_maker()     
+        if self.fiber_mask is None:
+            self.fiber_mask = self.fiber_segmentator() 
+        self.quality_metrics= get_quality_metrics(self.red_green_image,self.manual_mask, self.fiber_mask, element_size=2 )
+       
+        return self.quality_metrics
     
         
     

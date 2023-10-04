@@ -135,6 +135,39 @@ def contour_finder (mask):
     contours = [c for i,c in enumerate(contours) if hierarchy[0][i][3] != -1]
     return contours
 
+def contour_finder_instance_mask (instance_mask):
+    
+    instance_mask[0,:-1] = instance_mask[:-1,-1] = instance_mask[-1,::-1] = instance_mask[-2:0:-1,0] = instance_mask.max()
+    unique_colours = np.unique(instance_mask[np.nonzero(instance_mask)])
+    contours = []
+    for colour in unique_colours:
+        unique_colour_contour_mask = instance_mask == colour
+        unique_colour_contour_mask= np.array(unique_colour_contour_mask,dtype=np.uint8)
+        
+        
+        thresh, unique_colour_contour_binary  = cv2.threshold(unique_colour_contour_mask, 0, 255, cv2.THRESH_BINARY)
+        unique_colour_contour_binary = 255-unique_colour_contour_binary
+        conturs = contour_finder (unique_colour_contour_binary)
+        for contour in conturs:
+            contours.append(contour)
+                   
+    return contours
+
+def getcentre(contours):
+    M = cv2.moments(contours)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+    return((cX,cY))
+def are_same_fibres(cont2, cont1):
+    c1X,c1Y = getcentre(cont1)
+    #c2X,c2Y = getcentre(cont2)
+    dist = cv2.pointPolygonTest(cont2,(c1X,c1Y),True)
+    if dist > 0:
+        val = True
+    else:
+        val = False
+    return val
+
 def biggest_contour(mask, canny_thershold=100):
     
     mask_border= np.uint8(add_border(mask))
@@ -260,3 +293,58 @@ def ind_fiber_image_maker(rawim, maskim):
             #img_path = os.path.join(out_dir,filename+'_'+str(colour)+ '.tiff')
             #fibim.save(img_path)
     return ind_fibers_list, unique_colours
+def memb_mass_cal(img,contour,element_size=2): # 2 for IMC and 6 for IF
+    element = cv2.getStructuringElement(cv2.MORPH_RECT, (2 * element_size + 1, 2 * element_size + 1),
+                                        (element_size, element_size))
+    
+    black = np.zeros(img.shape[0:2],dtype=np.uint8)
+    cv2.drawContours(black,[contour], -1, (255), -1)
+    edge_eroded = black - cv2.erode(black,element) # area to check for dystrophin +ve
+    edge_dilated = cv2.dilate(black,element) - black  # area to check for VDAC +ve
+        
+        # calculating pixels in three area 1) dilated area 2) eroded area and 3) fibre area - eroded area
+    outer_pixels = edge_dilated == 255
+    inner_pixels = edge_eroded == 255
+    fibre_pixels = black == 255
+    check_area = outer_pixels + inner_pixels
+       
+    
+    
+    membrane_thresh = img[:,:,2] > np.quantile(img[:,:,2],0.85)
+    mito_mass_thresh = img[:,:,1] > np.quantile(img[:,:,1],0.75)
+   
+    
+   
+        
+        # calculating red(dystophin) and green(VDAC) pixels in appropriate areas
+    membrane_included = np.logical_and(membrane_thresh, inner_pixels)
+    mito_mass_missed = np.logical_and(mito_mass_thresh, outer_pixels)
+    
+        
+        # calculating proportions
+    proportion_membrane_included = (np.sum(membrane_included)/np.sum(inner_pixels))*100
+    proportion_mito_mass_missed = (np.sum(mito_mass_missed)/np.sum(outer_pixels))*100
+    
+        
+    
+    return proportion_membrane_included,proportion_mito_mass_missed
+
+def IoU_two_contours(image_shape,cont1, cont2):
+    contours = [cont1, cont2]
+
+        # Create image filled with zeros the same size of original image
+    blank = np.zeros(image_shape)
+
+        # Copy each contour into its own image and fill it with '1'
+    image1 = cv2.drawContours(blank.copy(), contours, 0, 255,thickness = cv2.FILLED) # 0 index contour i.e. first one
+    image2 = cv2.drawContours(blank.copy(), contours, 1, 255,thickness = cv2.FILLED) # 1 index contour i.e. second one
+
+        # Use the logical AND operation on the two images
+        # Since the two images had bitwise and applied to it,
+        # there should be a '1' or 'True' where there was intersection
+        # and a '0' or 'False' where it didnt intersect
+    intersection = np.logical_and(image1, image2)
+    union = np.logical_or(image1, image2)
+    IoU = np.sum(intersection)/np.sum(union)    
+          
+    return IoU

@@ -209,4 +209,51 @@ def get_FAM_mask(img, fiber_mask, SIZE=128):
             
     
     return FAM_mask
+
+def get_quality_metrics(img,mask_gt, mask_to_assess, element_size=2 ): # element_size= 2 for IMC and 6 for IF
+    
+    contours_GT= contour_finder_instance_mask(mask_gt)
+    contours_Assess= contour_finder_instance_mask(mask_to_assess)
+    
+    gt_memb_vals=[]
+    gt_mass_vals=[]
+    as_memb_vals=[]
+    as_mass_vals=[]
+    IoUs=[]
+    for i, cont_gt in enumerate(contours_GT):
+        
+        for j, cont_as in enumerate(contours_Assess):
+            
+            if are_same_fibres(contours_GT[i],contours_Assess[j]):
+                gt_memb_val, gt_mass_val= memb_mass_cal(img,contours_GT[i],element_size)
+                gt_memb_vals.append(gt_memb_val)
+                gt_mass_vals.append(gt_mass_val)
+                
+                as_memb_val, as_mass_val= memb_mass_cal(img,contours_Assess[j],element_size)
+                as_memb_vals.append(as_memb_val)
+                as_mass_vals.append(as_mass_val)
+                
+                IoU = IoU_two_contours(mask_gt.shape[0:2],contours_GT[i], contours_Assess[j])
+                IoUs.append(IoU)
+                
+                break
+    IoUs= np.asarray(IoUs, dtype=np.float16)
+    r_memb= np.corrcoef(gt_memb_vals, as_memb_vals)[1,0]
+    r_mass= np.corrcoef(gt_mass_vals, as_mass_vals)[1,0]
+    
+    IoU_mean= np.mean(IoUs)
+    
+    IoU_accuracy_at_80= (((IoUs >0.8).sum())/len(IoUs))*100
+    IoU_accuracy_at_90= (((IoUs >0.9).sum())/len(IoUs))*100
+    IoU_accuracy_at_95= (((IoUs >0.95).sum())/len(IoUs))*100
+    
+    return (r_memb,r_mass, IoU_mean,IoU_accuracy_at_80,IoU_accuracy_at_90,IoU_accuracy_at_95 )
+    
+    
+                
+                
+                
+                
+                
+    
     
