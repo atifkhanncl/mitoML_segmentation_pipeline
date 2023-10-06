@@ -112,11 +112,12 @@ class segmentor:
             else:
                 self.fiber_mask_stardist, details = stardist_predict(self.red_green_image)
                 self.fiber_mask_cellpose = cellpose_predict(self.red_green_image)
-                segmentor_model_to_use= input("By default the pipeline uses cellpose to segment myofibres if this ok press enter, otherwise to use stardist press 'S' and enter")
-                if segmentor_model_to_use.casefold() == 'S' :
-                    self.fiber_mask= self.fiber_mask_stardist
-                else:
-                    self.fiber_mask= self.fiber_mask_cellpose
+                self.fiber_mask = self.fiber_mask_cellpose
+                #segmentor_model_to_use= input("By default the pipeline uses cellpose to segment myofibres if this ok press enter, otherwise to use stardist press 'S' and enter")
+                #if segmentor_model_to_use.casefold() == 'S' :
+                #    self.fiber_mask= self.fiber_mask_stardist
+                #else:
+                #    self.fiber_mask= self.fiber_mask_cellpose
             
         return self.fiber_mask, self.fiber_mask_stardist, self.fiber_mask_cellpose
     
