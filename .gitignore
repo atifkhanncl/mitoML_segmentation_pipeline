@@ -37,3 +37,4 @@ input/raw_images/membrane_channel_images/MCD001_MDP_C09-10_B_A0_MP_MF0_S00_RR006
 *.pyc
 *.pyc
 output/*
+mitocytoML/__pycache__/*
