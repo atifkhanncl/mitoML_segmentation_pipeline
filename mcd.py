@@ -22,6 +22,7 @@ for mcd in mcd_list:
     mcd_root = os.path.basename(mcd_list[0]).replace(".mcd","")
     with MCDFile(mcd) as f:
         slide = f.slides[0]
+        slide_num = 0
         num_acquisitions = len(slide.acquisitions)
         for acquisition_num in range(0,num_acquisitions):
             acquisition = slide.acquisitions[acquisition_num]
@@ -29,31 +30,31 @@ for mcd in mcd_list:
             chans = acquisition.channel_labels
             mass_img = f.read_acquisition(acquisition)[[c == masschan for c in chans],:,:][0]
             membrane_img = f.read_acquisition(acquisition)[[c == membranechan for c in chans],:,:][0]
-            infile_manual_sample_mask_path= os.path.join(os.path.dirname(mcd), "{}_{}.tiff".format(mcd_root,desc)) # Shouldn't this point to output directory?
+            infile_manual_sample_mask_path= os.path.join(os.path.dirname(mcd), "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc)) # Shouldn't this point to output directory?
             manual_mask= cv2.imread(infile_manual_sample_mask_path,-1)
             if manual_mask is None:
                 manual_mask= np.zeros(mass_img.shape[0:2]).astype(np.uint16)
 
             # Why doesn't all this path generation happen in the data class?
-            outfile_path_red_green= os.path.join(data_obj.red_green_images_dir, "{}_{}.tiff".format(mcd_root,desc))
+            outfile_path_red_green= os.path.join(data_obj.red_green_images_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))
     
-            outfile_path_raw_fiber_segmentation= os.path.join(output_folder, data_obj.raw_segmented_masks_dir, "{}_{}.tiff".format(mcd_root,desc))        
-            outfile_path_raw_segmented_masks_stardist= os.path.join(data_obj.raw_segmented_masks_stardist_dir, "{}_{}.tiff".format(mcd_root,desc))
-            outfile_path_raw_segmented_masks_cellpose= os.path.join(data_obj.raw_segmented_masks_cellpose_dir, "{}_{}.tiff".format(mcd_root,desc)) 
+            outfile_path_raw_fiber_segmentation= os.path.join(output_folder, data_obj.raw_segmented_masks_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))        
+            outfile_path_raw_segmented_masks_stardist= os.path.join(data_obj.raw_segmented_masks_stardist_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))
+            outfile_path_raw_segmented_masks_cellpose= os.path.join(data_obj.raw_segmented_masks_cellpose_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc)) 
             
-            outfile_path_NTM_mask= os.path.join(data_obj.NTM_masks_dir, "{}_{}.tiff".format(mcd_root,desc))
-            outfile_path_NTM_removed_mask= os.path.join(data_obj.NTM_removed_masks_dir, "{}_{}.tiff".format(mcd_root,desc))
+            outfile_path_NTM_mask= os.path.join(data_obj.NTM_masks_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))
+            outfile_path_NTM_removed_mask= os.path.join(data_obj.NTM_removed_masks_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))
             
-            outfile_path_FAM_mask= os.path.join(data_obj.FAM_masks_dir, "{}_{}.tiff".format(mcd_root,desc))
-            outfile_path_FAM_removed_mask= os.path.join(data_obj.FAM_removed_masks_dir, "{}_{}.tiff".format(mcd_root,desc))
+            outfile_path_FAM_mask= os.path.join(data_obj.FAM_masks_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))
+            outfile_path_FAM_removed_mask= os.path.join(data_obj.FAM_removed_masks_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))
             
-            outfile_path_FR_mask= os.path.join(data_obj.FR_masks_dir, "{}_{}.tiff".format(mcd_root,desc))
-            outfile_path_FR_removed_mask= os.path.join(data_obj.FR_removed_dir, "{}_{}.tiff".format(mcd_root,desc))
+            outfile_path_FR_mask= os.path.join(data_obj.FR_masks_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))
+            outfile_path_FR_removed_mask= os.path.join(data_obj.FR_removed_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))
             
-            outfile_path_final_segmented_mask= os.path.join(data_obj.final_segmented_masks_dir, "{}_{}.tiff".format(mcd_root,desc))
+            outfile_path_final_segmented_mask= os.path.join(data_obj.final_segmented_masks_dir, "{}_S{:02d}_{}.tiff".format(mcd_root,slide_num,desc))
             
-            outfile_path_quality_metrics= os.path.join(data_obj.metrics_dir, "{}_{}.csv".format(mcd_root,desc))
-            outfile_path_fiber_metrics= os.path.join(data_obj.metrics_dir, "{}_{}_perFiber.csv".format(mcd_root,desc))
+            outfile_path_quality_metrics= os.path.join(data_obj.metrics_dir, "{}_S{:02d}_{}.csv".format(mcd_root,slide_num,desc))
+            outfile_path_fiber_metrics= os.path.join(data_obj.metrics_dir, "{}_S{:02d}_{}_perFiber.csv".format(mcd_root,slide_num,desc))
             
             segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,outfile_path_raw_segmented_masks_stardist,outfile_path_raw_segmented_masks_cellpose,outfile_path_NTM_mask,outfile_path_FAM_mask,outfile_path_FR_mask,outfile_path_final_segmented_mask)
             
