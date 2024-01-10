@@ -18,11 +18,14 @@ import imutils
 def get_stardist_model(model_name='stardist_model',directory= './models/model_fiber_segmentation/'):
     model = StarDist2D(None, name=model_name, basedir=directory)
     return model
-def get_cellpose_model(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model', use_gpu= False):
+def get_cellpose_model_imc(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc', use_gpu= False):
     model = cellpose_models.CellposeModel(gpu=use_gpu, 
                              pretrained_model=model_path)
     return model
-
+def get_cellpose_model_qif(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_qif', use_gpu= False):
+    model = cellpose_models.CellposeModel(gpu=use_gpu, 
+                             pretrained_model=model_path)
+    return model
 def stardist_predict(img_BGR):
     img = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)   
     model = get_stardist_model()
@@ -59,13 +62,27 @@ def cellpose_channel_arrangement(Channel_to_use_for_segmentation,Second_segmenta
     
     return chan, chan2
 
-def cellpose_predict(img_BGR, primary_channel='Green', secondary_channel='Red', fiber_diameter=65):
+def cellpose_predict(img_BGR,is_imc,is_qif,model_match_threshold, primary_channel='Green', secondary_channel='Red',cell_prob_thershold=0.0):
+    
+    if is_imc:
+        fiber_diameter=65
+        model= get_cellpose_model_imc()
+    if is_qif:
+        fiber_diameter=200
+        model= get_cellpose_model_qif()
+        
+    flow_style_threshold = (31.0 - model_match_threshold) / 10.
+           
     img = cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)    
     chan, chan2= cellpose_channel_arrangement(primary_channel,secondary_channel)   
-    model= get_cellpose_model()
+    
     mask, flow, style = model.eval(img, 
                                   channels=[chan, chan2],
-                                  diameter=fiber_diameter
+                                  diameter=fiber_diameter,
+                                  flow_threshold=flow_style_threshold, 
+                                  cellprob_threshold=cell_prob_thershold
+                                
+                                   
                                   
                                   )
     return mask
@@ -138,15 +155,20 @@ def process_folded_region_masks(img, contour_area_low_limit=18000):
 
    
 
-def NTM_identification_logic(fiber_area,fiber_on_border,fiber_convexity,fiber_lengthSquardedByArea,fiber_aspect_ratio):
+def NTM_identification_logic(fiber_area,fiber_on_border,fiber_convexity,fiber_lengthSquardedByArea,fiber_aspect_ratio, is_imc, is_qif, qif_resolution=0.323):
     return_flag= True
-    if fiber_area>210 and fiber_area<27000 and fiber_on_border is False and fiber_convexity<1.19 and fiber_lengthSquardedByArea < 3.10 and (not(fiber_aspect_ratio>2.2 and fiber_lengthSquardedByArea>1.8)):
-        return_flag= False
+    if is_imc:
+        if fiber_area>210 and fiber_area<27000 and fiber_on_border is False and fiber_convexity<1.19 and fiber_lengthSquardedByArea < 3.10 and (not(fiber_aspect_ratio>2.2 and fiber_lengthSquardedByArea>1.8)):
+            return_flag= False
+    if is_qif:
+        area_resolution=1/(qif_resolution*qif_resolution)
+        if fiber_area>(210*area_resolution) and fiber_area<(27000*area_resolution) and fiber_on_border is False and fiber_convexity<1.19 and fiber_lengthSquardedByArea < 3.10 and (not(fiber_aspect_ratio>2.2 and fiber_lengthSquaredByArea>1.8)):
+            return_flag=False
         
     return return_flag
         
 
-def get_NTM_mask(instance_mask):
+def get_NTM_mask(instance_mask,is_imc,is_qif):
     
     mask= np.copy(instance_mask)
     
@@ -163,7 +185,7 @@ def get_NTM_mask(instance_mask):
         fib_lengthSquardedByArea= fiber_lengthSquaredbyArea_bbox(individual_fiber_mask, fib_area)
         fiber_metrics.append((fib_area,fib_on_border,fib_convexity,fib_lengthSquardedByArea,fib_aspect_ratio))
         
-        if NTM_identification_logic(fib_area,fib_on_border,fib_convexity,fib_lengthSquardedByArea,fib_aspect_ratio):
+        if NTM_identification_logic(fib_area,fib_on_border,fib_convexity,fib_lengthSquardedByArea,fib_aspect_ratio,is_imc,is_qif):
             NTM_fibre_ids.append(fiber_id)
     NTM_mask= mask_selected_fibers_array_retain (mask, np.array(NTM_fibre_ids))
     #Non_NTM_mask= mask_selected_fibers_array_remove (mask, NTM_fibre_ids.to_numpy())

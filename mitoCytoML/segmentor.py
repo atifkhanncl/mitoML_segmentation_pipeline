@@ -15,10 +15,10 @@ class segmentor:
             
     """
 
-    def __init__(self,membrane_channel, mass_channel,manual_mask, red_green_file_path, fiber_mask_path,stardist_mask_path,cellpose_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path):
+    def __init__(self,membrane_channel, mass_channel,manual_mask, red_green_file_path, fiber_mask_path,stardist_mask_path,cellpose_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path,model_match_threshold,is_imc,is_qif):
         
         """
-         Constructs all the necessary attributes to create an Segmentor.
+         Constructs all the necessary attributes to create a segmentor.
             Parameters:
                 mass channel (np.ndarray): 3D array containing data with `uint16` type.
                 membranechannel (np.ndarray, optional): 3D array containing
@@ -31,6 +31,9 @@ class segmentor:
         self.manual_mask= manual_mask
         self.c_limit_membrane = 0.1
         self.c_limit_mass = 0.4
+        self.is_imc= is_imc
+        self.is_qif= is_qif
+        self.model_match_threshold= model_match_threshold
         self.red_green_file_path = red_green_file_path
         self.fiber_mask_path = fiber_mask_path
         self.stardist_mask_path= stardist_mask_path
@@ -111,7 +114,7 @@ class segmentor:
                 
             else:
                 self.fiber_mask_stardist, details = stardist_predict(self.red_green_image)
-                self.fiber_mask_cellpose = cellpose_predict(self.red_green_image)
+                self.fiber_mask_cellpose = cellpose_predict(self.red_green_image,self.is_imc,self.is_qif,self.model_match_threshold)
                 self.fiber_mask = self.fiber_mask_cellpose
                 #segmentor_model_to_use= input("By default the pipeline uses cellpose to segment myofibres if this ok press enter, otherwise to use stardist press 'S' and enter")
                 #if segmentor_model_to_use.casefold() == 'S' :
@@ -137,7 +140,7 @@ class segmentor:
             if check_file_exist(self.NTM_mask_path):
                 self.NTM_mask= read_image(self.NTM_mask_path)
             else:
-                self.NTM_mask, self.fiber_metrics = get_NTM_mask(self.fiber_mask)
+                self.NTM_mask, self.fiber_metrics = get_NTM_mask(self.fiber_mask,self.is_imc,self.is_qif)
         
         return self.NTM_mask, self.fiber_metrics
     

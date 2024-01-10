@@ -5,7 +5,7 @@ import os
 import cv2
 import csv
 Image.MAX_IMAGE_PIXELS = None
-from skimage import exposure, img_as_float,img_as_uint
+from skimage import exposure, img_as_float,img_as_uint, io
 from skimage.morphology import convex_hull_image
 from scipy.spatial.distance import cdist
 from csbdeep.utils import normalize
@@ -26,10 +26,13 @@ def dir_create(path):
         os.makedirs(path)
 
 def read_image(img_path):
-    img_BGR= cv2.imread(img_path,-1)
+    img_BGR= cv2.imread(img_path,flags=(cv2.IMREAD_UNCHANGED | cv2.IMREAD_ANYDEPTH))
     #img_RGB=cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)
     return img_BGR
-
+def read_image_io(img_path):
+    img_BGR= io.imread(img_path)
+    #img_RGB=cv2.cvtColor(img_BGR, cv2.COLOR_BGR2RGB)
+    return img_BGR
 def contrast_stretching_quantiles(channel,plow,phigh):
     channel= img_as_float(channel)
     plower, phigher = np.percentile(channel, (plow, phigh))
@@ -233,10 +236,20 @@ def fiber_lengthSquaredbyArea_bbox(individual_fiber_mask, fiber_area):
     lengthSquaredbyArea_bbox= (length_bbox *length_bbox)/fiber_area
     
     return lengthSquaredbyArea_bbox
+def get_unique_labels_in_mask(mask):
+    return np.unique(mask[np.nonzero(mask)])
 
+def get_unique_labels_of_ovelapping_pixels(mask_to_get_label_ids_from, mask_overlapping):
+    return np.unique(mask_to_get_label_ids_from[np.nonzero(mask_overlapping)])
 def mask_selected_fibers_array_remove (mask_proper, fibres_to_remove_array):    
     
     blank= np.zeros(mask_proper.shape[0:2]).astype(np.uint16)
+    mask_to_return= np.where(np.isin(mask_proper, fibres_to_remove_array), blank, mask_proper)
+                      
+    return mask_to_return
+def mask_selected_fibers_array_remove_32 (mask_proper, fibres_to_remove_array):    
+    
+    blank= np.zeros(mask_proper.shape[0:2]).astype(np.uint32)
     mask_to_return= np.where(np.isin(mask_proper, fibres_to_remove_array), blank, mask_proper)
                       
     return mask_to_return
@@ -247,6 +260,7 @@ def mask_selected_fibers_array_retain (mask_proper, fibres_to_retain_array):
     mask_to_return= np.where(np.isin(mask_proper, fibres_to_retain_array), mask_proper, blank)
                        
     return mask_to_return
+
 
 def from_mask_to_remove_mask (mask_proper, mask_remove):
     

@@ -1,12 +1,18 @@
 
 *.pyc
 *.pyc
+output_ig/
+output1/
 model_FR/FR_model.hdf5
 NA_fibers/P02.tiff
-raw_segmented_masks/P02.tiff
-FR_removed_fiber_mask/P02.tiff
-FR_masks/P02.tiff
+output/raw_segmented_masks/P02.tiff
+output/FR_removed_fiber_mask/P02.tiff
+output/FR_masks/P02.tiff
 final_segmented_masks/P02.tiff
+input/raw_images/mass_channel_images/S48.tiff
+input/raw_images/membrane_channel_images/S48.tiff
+input/manual_sample_masks/S48.tiff
+input/raw_images/mass_channel_images/MCD001_MDP_C09-10_B_A0_MP_MF0_S00_RR001_C09_B0.tiff
 input/raw_images/mass_channel_images/MCD001_MDP_C09-10_B_A0_MP_MF0_S00_RR001_C09_B0.tiff
 input/raw_images/mass_channel_images/MCD001_MDP_C09-10_B_A0_MP_MF0_S00_RR001_C10_B0.tiff
 input/raw_images/mass_channel_images/MCD001_MDP_C09-10_B_A0_MP_MF0_S00_RR002_C09_B0.tiff

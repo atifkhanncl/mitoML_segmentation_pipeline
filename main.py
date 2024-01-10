@@ -6,8 +6,24 @@ import numpy as np
 data_obj = data.data_obj ()
 data_obj.create_dir_structure()
 
-value = input("Please place required raw images into the respective folder then press 'y' and enter")
-if value == 'y' or 'Y':
+response_1= input("Types of images: For QIF press'Q' and enter or For IMC press 'I' and enter: ")
+if response_1 =='Q' or 'q':
+    is_qif= True
+    is_imc= False
+if response_1 == 'I' or 'i':
+    is_imc= True
+    is_qif= False
+if response_1 not in [ 'Q', 'q' ,'I' ,'i']:
+    print('incorrect option selected '+response_1+' , start again')
+
+response_2= input("will use default settings. To continue press enter, If not, press 'n' and enter ")
+if response_2== 'n' or 'N':
+    model_match_threshold= input("Enter model_match_threshold (range from 1-31) value and press enter")
+if response_2!= 'n' or 'N':
+    model_match_threshold=27
+    
+response_3 = input("Please place required raw images into the respective folder then press 'y' and enter")
+if response_3 == 'y' or 'Y':
     membrane_list, mass_list = data_obj.get_image_list()
     for infile in membrane_list:
         infile_mass_channel_path= os.path.join(data_obj.mass_channel_dir, infile)
@@ -40,7 +56,7 @@ if value == 'y' or 'Y':
         if manual_mask is None:
             manual_mask= np.zeros(mass_img.shape[0:2]).astype(np.uint16)
         
-        segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,outfile_path_raw_segmented_masks_stardist,outfile_path_raw_segmented_masks_cellpose,outfile_path_NTM_mask,outfile_path_FAM_mask,outfile_path_FR_mask,outfile_path_final_segmented_mask)
+        segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,outfile_path_raw_segmented_masks_stardist,outfile_path_raw_segmented_masks_cellpose,outfile_path_NTM_mask,outfile_path_FAM_mask,outfile_path_FR_mask,outfile_path_final_segmented_mask,model_match_threshold,is_imc,is_qif)
         
         red_green_image = segmentor_obj.red_green_image_maker()   
         cv2.imwrite(outfile_path_red_green,red_green_image) 
