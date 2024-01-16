@@ -33,6 +33,39 @@ Step 3: follow the prompts on the terminal.
 
 Step 4: At completion. Find all masks in output folder. If you're not happy with any mask, please open it in napari and correct it and save it. Following this re-run the pipeline to allow it use the corrected masks.
 
+## Reviewing mitocytoML outputs
+You can review and correct all generated masks using review.py
+
+
+Step 1: using terminal navigate to repo and and type 'python review.py'
+
+Step 2: Type filename and enter. This will open a napari session with 6 layers. With image on ‘view’ mode and all masks on hide mode
+
+Step 3: Review ‘Segmented_Fibres’ layer
+-  1.  You can change borders of existing fibres by selecting fiber id and using brush or eraser tool
+-  2.  To add a new fibre press ‘m’ key and annotate new fibre using brush and bucket tool
+-  3.  To save corrections press ‘s’ key (press mind 'save' is expensive operation can take upto 30 seconds)
+
+Step 4: Review ‘Folded_Regions’ layer
+-  1.  To correct folded region mask, use eraser, brush tools
+-  2.  If you want to reject all existing annotations press ‘r’ key
+-  3.  To save corrections press ‘s’ key (press mind 'save' is expensive operation can take upto 30 seconds)
+
+Step 5: Review ‘NTMs’ layer
+-  1.  To change the classification of any fibres, double click on the fibre
+-  2.  If you want to reject all existing annotations press ‘r’ key
+-  3.  To save corrections press ‘s’ key (press mind 'save' is expensive operation can take upto 30 seconds)
+   
+
+Step 6: Review ‘FAMs’ layer
+-  1.  To change the classification of any fibres, double click on the fibre
+-  2.  If you want to reject all existing annotations press ‘r’ key
+-  3.  To save corrections press ‘s’ key (press mind 'save' is expensive operation can take upto 30 seconds)
+
+Step 7: Review ‘final’ layer
+-  Upon reviewing step 1-6, if you're happy with all layers please press ‘s’ key. This will save all corrections and compute new ‘final’ mask.
+       
+
 ## Segmenting fibers
 
 mitocytoML can be utilised to segment muscle fibers from IMC and IF image data either by just running 'main.py' or with 3 simple steps:
