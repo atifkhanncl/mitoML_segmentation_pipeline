@@ -8,6 +8,7 @@ Image.MAX_IMAGE_PIXELS = None
 from skimage import exposure, img_as_float,img_as_uint, io
 from skimage.morphology import convex_hull_image
 from scipy.spatial.distance import cdist
+from scipy.spatial import ConvexHull,Delaunay
 from csbdeep.utils import normalize
 
 
@@ -116,8 +117,22 @@ def fiber_areas(mask,min_area=1):
     pixels_ids_and_area= {k:v for k, v in pixel_val_count.items() if v > min_area}
     return pixels_ids_and_area
 
+def flood_fill_hull(image):    
+    points = np.transpose(np.where(image))
+    hull = ConvexHull(points)
+    deln = Delaunay(points[hull.vertices]) 
+    idx = np.stack(np.indices(image.shape), axis = -1)
+    out_idx = np.nonzero(deln.find_simplex(idx) + 1)
+    out_img = np.zeros(image.shape)
+    out_img[out_idx] = 1
+    return out_img, hull
+
 def fiber_convexity(individual_fiber_mask, fiber_area):
-    convexity = (np.count_nonzero(convex_hull_image(individual_fiber_mask)))/fiber_area
+    
+    #convexity = (np.count_nonzero(convex_hull_image(individual_fiber_mask)))/fiber_area
+    
+    hull_mask,hull= flood_fill_hull(individual_fiber_mask)
+    convexity = (np.count_nonzero(hull_mask))/fiber_area
     
     return convexity
 
