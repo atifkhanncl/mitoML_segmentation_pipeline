@@ -12,9 +12,11 @@ response_1= input("Types of images: For QIF press'Q' and enter or For IMC press 
 if response_1 =='Q' or 'q':
     is_qif= True
     is_imc= False
+    cv_mode= 0
 if response_1 == 'I' or 'i':
     is_imc= True
     is_qif= False
+    cv_mode= -1
 if response_1 not in [ 'Q', 'q' ,'I' ,'i']:
     print('incorrect option selected '+response_1+' , start again')
 
@@ -49,8 +51,8 @@ if response_3 == 'y' or 'Y':
         outfile_path_quality_metrics= os.path.join(data_obj.metrics_dir, infile.split('.')[0]+'.csv')
         outfile_path_fiber_metrics= os.path.join(data_obj.metrics_dir, infile.split('.')[0]+'_perFiber.csv')
         
-        mass_img= cv2.imread(infile_mass_channel_path,-1)
-        membrane_img= cv2.imread(infile_membrane_channel_path,-1)
+        mass_img= cv2.imread(infile_mass_channel_path,cv_mode)
+        membrane_img= cv2.imread(infile_membrane_channel_path,cv_mode)
         manual_mask= cv2.imread(infile_manual_sample_mask_path,-1)
         if manual_mask is None:
             manual_mask= np.zeros(mass_img.shape[0:2]).astype(np.uint16)
