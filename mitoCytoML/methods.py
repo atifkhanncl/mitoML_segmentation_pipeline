@@ -24,7 +24,7 @@ def get_cellpose_model_imc(model_path='./models/model_fiber_segmentation/cellpos
     model = cellpose_models.CellposeModel(gpu=use_gpu, 
                              pretrained_model=model_path)
     return model
-def get_cellpose_model_qif(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_qif', use_gpu= torch.cuda. is_available()):
+def get_cellpose_model_qif(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc', use_gpu= torch.cuda. is_available()):
     model = cellpose_models.CellposeModel(gpu=use_gpu, 
                              pretrained_model=model_path)
     return model
