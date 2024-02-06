@@ -15,7 +15,7 @@ class segmentor:
             
     """
 
-    def __init__(self,membrane_channel, mass_channel,manual_mask, red_green_file_path, fiber_mask_path,stardist_mask_path,cellpose_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path,model_match_threshold,is_imc,is_qif):
+    def __init__(self,membrane_channel, mass_channel,manual_mask, red_green_file_path, fiber_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path,model_match_threshold,is_imc,is_qif):
         
         """
          Constructs all the necessary attributes to create a segmentor.
@@ -36,8 +36,8 @@ class segmentor:
         self.model_match_threshold= model_match_threshold
         self.red_green_file_path = red_green_file_path
         self.fiber_mask_path = fiber_mask_path
-        self.stardist_mask_path= stardist_mask_path
-        self.cellpose_mask_path=cellpose_mask_path
+        #self.stardist_mask_path= stardist_mask_path
+        #self.cellpose_mask_path=cellpose_mask_path
         self.NTM_mask_path = NTM_mask_path
         self.FAM_mask_path = FAM_mask_path       
         self.FR_mask_path = FR_mask_path
@@ -108,12 +108,12 @@ class segmentor:
         if self.fiber_mask is None:
             if check_file_exist(self.fiber_mask_path):
                 self.fiber_mask= read_image(self.fiber_mask_path)
-                self.fiber_mask_stardist= read_image(self.stardist_mask_path)
-                self.fiber_mask_cellpose= read_image(self.cellpose_mask_path)
+                #self.fiber_mask_stardist= read_image(self.stardist_mask_path)
+                #self.fiber_mask_cellpose= read_image(self.cellpose_mask_path)
                 
                 
             else:
-                self.fiber_mask_stardist, details = stardist_predict(self.red_green_image)
+                #self.fiber_mask_stardist, details = stardist_predict(self.red_green_image)
                 self.fiber_mask_cellpose = cellpose_predict(self.red_green_image,self.is_imc,self.is_qif,self.model_match_threshold)
                 self.fiber_mask = self.fiber_mask_cellpose
                 #segmentor_model_to_use= input("By default the pipeline uses cellpose to segment myofibres if this ok press enter, otherwise to use stardist press 'S' and enter")
@@ -122,7 +122,7 @@ class segmentor:
                 #else:
                 #    self.fiber_mask= self.fiber_mask_cellpose
             
-        return self.fiber_mask, self.fiber_mask_stardist, self.fiber_mask_cellpose
+        return self.fiber_mask
     
     
     def NTM_mask_maker(self):

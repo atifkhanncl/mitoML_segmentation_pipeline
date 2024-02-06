@@ -288,6 +288,22 @@ def from_mask_to_remove_mask (mask_proper, mask_remove):
     
                    
     return mask_to_return  
+ 
+    
+def reduced_individual_fiber_mask(full_mask):
+    maskarr = np.copy(full_mask)
+    end_row = maskarr.shape[0]
+    end_column = maskarr.shape[1]
+    fibmask = maskarr==255
+    bbox = bbox2(fibmask)
+    start_row= (bbox[0] -3) if bbox[0]>2 else bbox[0]
+    stop_row= (bbox[1] +3) if bbox[1]<(end_row -2) else bbox[1]
+    start_column= (bbox[2] -3) if bbox[2]>2 else bbox[2]
+    stop_column= (bbox[3] +3) if bbox[3]<(end_column -2) else bbox[3]
+    fibarr = maskarr[bbox[0]:bbox[1],bbox[2]:bbox[3]]
+    
+    
+    return fibarr
     
 def ind_fiber_image_maker(rawim, maskim):
     maskarr = np.array(maskim,dtype=np.uint16)
@@ -298,6 +314,7 @@ def ind_fiber_image_maker(rawim, maskim):
     # Discard black background
     unique_colours = [c for c in unique_colours if c!=0]
     ind_fibers_list = []
+    unique_colours_list = []
     for colour in unique_colours:
         # Find pixels belonging to specific fibre
         fibmask = maskarr==colour
@@ -318,10 +335,11 @@ def ind_fiber_image_maker(rawim, maskim):
             # Delete any non-fibre pixels that remain in bounding box
             fibarr[np.logical_not(fibmask2)] = [0,0,0]
             ind_fibers_list.append(fibarr)
+            unique_colours_list.append(colour)
             #fibim = Image.fromarray(fibarr)
             #img_path = os.path.join(out_dir,filename+'_'+str(colour)+ '.tiff')
             #fibim.save(img_path)
-    return ind_fibers_list, unique_colours
+    return ind_fibers_list, unique_colours_list
 def memb_mass_cal(img,contour,element_size=2): # 2 for IMC and 6 for IF
     element = cv2.getStructuringElement(cv2.MORPH_RECT, (2 * element_size + 1, 2 * element_size + 1),
                                         (element_size, element_size))

@@ -4,6 +4,7 @@ import os
 import cv2
 import numpy as np
 import time
+from tqdm import tqdm
 data_obj = data.data_obj ()
 data_obj.create_dir_structure()
 model_match_threshold=27
@@ -22,10 +23,10 @@ if response_1 not in [ 'Q', 'q' ,'I' ,'i']:
 
 
     
-response_3 = input("Please place required raw images into the respective folder then press 'y' and enter")
+response_3 = input("Please place required raw images into the respective folder then press 'y' and enter ")
 if response_3 == 'y' or 'Y':
     membrane_list, mass_list = data_obj.get_image_list()
-    for infile in membrane_list:
+    for infile in tqdm(membrane_list, desc = "Input Images Processed"):
         start = time.time()
         infile_mass_channel_path= os.path.join(data_obj.mass_channel_dir, infile)
         infile_membrane_channel_path= os.path.join(data_obj.membrane_channel_dir, infile)
@@ -34,8 +35,8 @@ if response_3 == 'y' or 'Y':
         outfile_path_red_green= os.path.join(data_obj.red_green_images_dir, infile)
         
         outfile_path_raw_fiber_segmentation= os.path.join(data_obj.raw_segmented_masks_dir, infile.split('.')[0] + '.tiff')        
-        outfile_path_raw_segmented_masks_stardist= os.path.join(data_obj.raw_segmented_masks_stardist_dir, infile.split('.')[0] + '.tiff')
-        outfile_path_raw_segmented_masks_cellpose= os.path.join(data_obj.raw_segmented_masks_cellpose_dir, infile.split('.')[0] + '.tiff') 
+        #outfile_path_raw_segmented_masks_stardist= os.path.join(data_obj.raw_segmented_masks_stardist_dir, infile.split('.')[0] + '.tiff')
+        #outfile_path_raw_segmented_masks_cellpose= os.path.join(data_obj.raw_segmented_masks_cellpose_dir, infile.split('.')[0] + '.tiff') 
         
         outfile_path_NTM_mask= os.path.join(data_obj.NTM_masks_dir, infile.split('.')[0] + '.tiff')
         outfile_path_NTM_removed_mask= os.path.join(data_obj.NTM_removed_masks_dir, infile.split('.')[0] + '.tiff')
@@ -57,16 +58,16 @@ if response_3 == 'y' or 'Y':
         if manual_mask is None:
             manual_mask= np.zeros(mass_img.shape[0:2]).astype(np.uint16)
         
-        segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,outfile_path_raw_segmented_masks_stardist,outfile_path_raw_segmented_masks_cellpose,outfile_path_NTM_mask,outfile_path_FAM_mask,outfile_path_FR_mask,outfile_path_final_segmented_mask,model_match_threshold,is_imc,is_qif)
+        segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,outfile_path_NTM_mask,outfile_path_FAM_mask,outfile_path_FR_mask,outfile_path_final_segmented_mask,model_match_threshold,is_imc,is_qif)
         
         red_green_image = segmentor_obj.red_green_image_maker()   
         cv2.imwrite(outfile_path_red_green,red_green_image) 
-        print('Red-Green contrasted for '+infile.split('.')[0]+' image completed  ')
+        print('\n Red-Green contrasted '+infile.split('.')[0]+' image completed  ')
         start_raw = time.time()
-        fiber_mask,fiber_mask_stardist, fiber_mask_cellpose  = segmentor_obj.fiber_segmentator()
+        fiber_mask = segmentor_obj.fiber_segmentator()
         cv2.imwrite(outfile_path_raw_fiber_segmentation,fiber_mask)
-        cv2.imwrite(outfile_path_raw_segmented_masks_stardist,fiber_mask_stardist)
-        cv2.imwrite(outfile_path_raw_segmented_masks_cellpose,fiber_mask_cellpose)
+        #cv2.imwrite(outfile_path_raw_segmented_masks_stardist,fiber_mask_stardist)
+        #cv2.imwrite(outfile_path_raw_segmented_masks_cellpose,fiber_mask_cellpose)
         stop_raw = time.time()
         t_raw= stop_raw-start_raw
         print('Raw segmented masks for '+infile.split('.')[0]+' image completed in  '+ str(t_raw)  + ' seconds')

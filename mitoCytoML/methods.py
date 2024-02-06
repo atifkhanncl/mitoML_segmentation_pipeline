@@ -4,6 +4,7 @@ from stardist.models import StarDist2D
 from cellpose import models as cellpose_models
 from stardist import fill_label_holes
 from csbdeep.utils import Path, normalize, axes_check_and_normalize
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 from tensorflow import keras
 from keras_unet_collection import models, losses
 from keras.models import load_model
@@ -12,17 +13,18 @@ import xgboost as xgb
 import numpy as np
 import cv2
 import imutils
+import torch
 
 
 
 def get_stardist_model(model_name='stardist_model',directory= './models/model_fiber_segmentation/'):
     model = StarDist2D(None, name=model_name, basedir=directory)
     return model
-def get_cellpose_model_imc(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc', use_gpu= False):
+def get_cellpose_model_imc(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc', use_gpu= torch.cuda. is_available()):
     model = cellpose_models.CellposeModel(gpu=use_gpu, 
                              pretrained_model=model_path)
     return model
-def get_cellpose_model_qif(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_qif', use_gpu= False):
+def get_cellpose_model_qif(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_qif', use_gpu= torch.cuda. is_available()):
     model = cellpose_models.CellposeModel(gpu=use_gpu, 
                              pretrained_model=model_path)
     return model
@@ -180,9 +182,11 @@ def get_NTM_mask(instance_mask,is_imc,is_qif):
         individual_fiber_mask= np.array(((mask == fiber_id)*255),dtype=np.uint8) 
         fib_area= fiber_areas_with_ids[fiber_id]
         fib_on_border= fiber_at_border(individual_fiber_mask)
-        fib_convexity= fiber_convexity(individual_fiber_mask, fib_area)
-        fib_aspect_ratio= fiber_aspect_ratio(individual_fiber_mask)
-        fib_lengthSquardedByArea= fiber_lengthSquaredbyArea_bbox(individual_fiber_mask, fib_area)
+        reduced_ind_fiber_mask= reduced_individual_fiber_mask(individual_fiber_mask)
+        
+        fib_convexity= fiber_convexity(reduced_ind_fiber_mask, fib_area)
+        fib_aspect_ratio= fiber_aspect_ratio(reduced_ind_fiber_mask)
+        fib_lengthSquardedByArea= fiber_lengthSquaredbyArea_bbox(reduced_ind_fiber_mask, fib_area)
         fiber_metrics.append((fib_area,fib_on_border,fib_convexity,fib_lengthSquardedByArea,fib_aspect_ratio))
         
         if NTM_identification_logic(fib_area,fib_on_border,fib_convexity,fib_lengthSquardedByArea,fib_aspect_ratio,is_imc,is_qif):
@@ -191,13 +195,17 @@ def get_NTM_mask(instance_mask,is_imc,is_qif):
     #Non_NTM_mask= mask_selected_fibers_array_remove (mask, NTM_fibre_ids.to_numpy())
     
     return NTM_mask,fiber_metrics
-    
-def get_VGG16_features(scaled_img, SIZE=128):
+ 
+def get_pre_train_vgg16_model(SIZE=128):
     VGG_model = VGG16(weights='imagenet', include_top=False, input_shape=(SIZE, SIZE, 3))
     for layer in VGG_model.layers:
         layer.trainable = False
+    return VGG_model
     
-    predicted_features= VGG_model.predict(scaled_img)
+def get_VGG16_features(scaled_img,VGG_model, SIZE=128):
+    
+    
+    predicted_features= VGG_model.predict(scaled_img,verbose=0)
     predicted_features= predicted_features.reshape(predicted_features.shape[0], -1)
     
     return predicted_features
@@ -211,16 +219,17 @@ def get_FAM_classifier(name='xgBoost.json',directory= './models/model_FAM_classi
 def get_FAM_mask(img, fiber_mask, SIZE=128):
     fib_mask= np.copy(fiber_mask)
     ind_fiber_list, unique_colours= ind_fiber_image_maker(img, fib_mask)
+    VGG_model= get_pre_train_vgg16_model(SIZE)
     model = get_FAM_classifier()
     FAM_ids=[]
     
     #NA_mask= np.zeros(fib_mask.shape,dtype=np.uint8)
     #NA_mask_255 = np.zeros(fib_mask.shape,dtype=np.uint8)
     for img, unique_colour in zip(ind_fiber_list, unique_colours):
-        img = cv2.resize(img,(SIZE,SIZE))
-        img_scaled = img/255.0
+        img1 = cv2.resize(img,(SIZE,SIZE))
+        img_scaled = img1/255.0
         input_img= np.expand_dims(img_scaled, axis=0)
-        input_img_features = get_VGG16_features(input_img, SIZE)
+        input_img_features = get_VGG16_features(input_img, VGG_model, SIZE)
         model=  get_FAM_classifier()
         prediction = model.predict(input_img_features)[0]
         

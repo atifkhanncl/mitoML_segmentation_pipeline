@@ -15,8 +15,8 @@ manual_sample_masks_dir= './input/manual_sample_masks/'
 red_green_images_dir= "./output/red_green_images"
 
 raw_segmented_masks_dir ="./output/Step_1/raw_segmented_masks/"
-raw_segmented_masks_stardist_dir ="./output/Step_1/raw_segmented_masks/stardist"
-raw_segmented_masks_cellpose_dir ="./output/Step_1/raw_segmented_masks/cellpose"
+#raw_segmented_masks_stardist_dir ="./output/Step_1/raw_segmented_masks/stardist"
+#raw_segmented_masks_cellpose_dir ="./output/Step_1/raw_segmented_masks/cellpose"
 
 NTM_masks_dir ='./output/Step_2A/NTM_masks/'
 NTM_removed_masks_dir ='./output/Step_2A/NTM_removed_masks/'
@@ -69,8 +69,8 @@ class data_obj:
         
         
         self.raw_segmented_masks_dir = raw_segmented_masks_dir
-        self.raw_segmented_masks_stardist_dir = raw_segmented_masks_stardist_dir
-        self.raw_segmented_masks_cellpose_dir = raw_segmented_masks_cellpose_dir
+        #self.raw_segmented_masks_stardist_dir = raw_segmented_masks_stardist_dir
+        #self.raw_segmented_masks_cellpose_dir = raw_segmented_masks_cellpose_dir
         
         self.NTM_masks_dir= NTM_masks_dir
         self.NTM_removed_masks_dir= NTM_removed_masks_dir
@@ -116,11 +116,11 @@ class data_obj:
     def raw_segmented_masks_dir(self):
         return self.raw_segmented_masks_dir
     
-    def raw_segmented_masks_stardist_dir(self):
-        return self.raw_segmented_masks_stardist_dir
+    #def raw_segmented_masks_stardist_dir(self):
+        #return self.raw_segmented_masks_stardist_dir
     
-    def raw_segmented_masks_cellpose_dir(self):
-        return self.raw_segmented_masks_cellpose_dir
+    #def raw_segmented_masks_cellpose_dir(self):
+        #return self.raw_segmented_masks_cellpose_dir
     
     def NTM_masks_dir(self):
         return NTM_masks_dir
@@ -177,8 +177,8 @@ class data_obj:
         
         
         dir_create(raw_segmented_masks_dir)
-        dir_create(raw_segmented_masks_stardist_dir)
-        dir_create(raw_segmented_masks_cellpose_dir)
+        #dir_create(raw_segmented_masks_stardist_dir)
+        #dir_create(raw_segmented_masks_cellpose_dir)
         
         dir_create(NTM_masks_dir)
         dir_create(NTM_removed_masks_dir)
