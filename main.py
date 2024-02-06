@@ -5,10 +5,16 @@ import cv2
 import numpy as np
 import time
 from tqdm import tqdm
+import torch
 data_obj = data.data_obj ()
 data_obj.create_dir_structure()
 model_match_threshold=27
 
+if torch.cuda. is_available():
+    print ("GPU and CUDA detected and will be used")
+else:
+    print ("GPU and CUDA not detected and CPU will be used")
+    
 response_1= input("Types of images: For QIF press'Q' and enter or For IMC press 'I' and enter: ")
 if response_1 =='Q' or 'q':
     is_qif= True
