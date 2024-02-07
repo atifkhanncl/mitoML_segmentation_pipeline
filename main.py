@@ -38,7 +38,7 @@ if response_3 == 'y' or 'Y':
         infile_membrane_channel_path= os.path.join(data_obj.membrane_channel_dir, infile)
         infile_manual_sample_mask_path= os.path.join(data_obj.manual_sample_masks_dir, infile.split('.')[0] + '.tiff')
         
-        outfile_path_red_green= os.path.join(data_obj.red_green_images_dir, infile)
+        outfile_path_red_green= os.path.join(data_obj.red_green_images_dir, infile.split('.')[0] + '.tiff')
         
         outfile_path_raw_fiber_segmentation= os.path.join(data_obj.raw_segmented_masks_dir, infile.split('.')[0] + '.tiff')        
         #outfile_path_raw_segmented_masks_stardist= os.path.join(data_obj.raw_segmented_masks_stardist_dir, infile.split('.')[0] + '.tiff')

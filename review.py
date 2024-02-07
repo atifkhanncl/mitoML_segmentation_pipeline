@@ -9,6 +9,7 @@ np.random.seed(1)
 fname= input("Type the filename to review and enter: ")
 fname= fname+".tiff"
 
+
 viewer = napari.Viewer()
 
 

@@ -3,6 +3,8 @@
 *.pyc
 output_ig/
 output1/
+output/
+input/raw_images/
 model_FR/FR_model.hdf5
 NA_fibers/P02.tiff
 output/raw_segmented_masks/P02.tiff
