@@ -89,7 +89,7 @@ In order to use a GPU:
 
 3. Re-install a GPU version of PyTorch via conda using a command that you can find [here](https://pytorch.org/get-started/locally/) (this takes care of the cuda toolkit, cudnn etc. so **no need to install manually anything more than the driver**). The command will look like this:
 
-        conda install pytorch torchvision cudatoolkit=11.3 -c pytorch
+        pip install pytorch torchvision cudatoolkit=11.3 -c pytorch
 ## Viewing the resulted images and masks
 
 we encourage you use [napari] (https://napari.org/stable/) to view results.
