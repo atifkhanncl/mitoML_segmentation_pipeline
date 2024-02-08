@@ -87,9 +87,9 @@ In order to use a GPU:
 
 2. Make sure your have up-to-date drivers for your NVIDIA card installed.
 
-3. Re-install a GPU version of PyTorch via conda using a command that you can find [here](https://pytorch.org/get-started/locally/) (this takes care of the cuda toolkit, cudnn etc. so **no need to install manually anything more than the driver**). The command will look like this:
+3. Re-install a GPU version of PyTorch via conda using a command that you can find [here](https://pytorch.org/get-started/locally/) (this takes care of the cuda toolkit, cudnn etc. so **no need to install manually anything more than the driver**). The command will look like this (but you should generate your own version of the command below using the tool on that webpage):
 
-        pip install pytorch torchvision cudatoolkit=11.3 -c pytorch
+        pip3.9 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 ## Viewing the resulted images and masks
 
 we encourage you use [napari] (https://napari.org/stable/) to view results.
