@@ -4,6 +4,7 @@
 output_ig/
 output1/
 output/
+.ipynb_checkpoints
 input/raw_images/
 model_FR/FR_model.hdf5
 NA_fibers/P02.tiff

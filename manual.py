@@ -9,6 +9,7 @@ import torch
 data_obj = data.data_obj ()
 data_obj.create_dir_structure()
 model_match_threshold=27
+use_gpu= True
 
 if torch.cuda. is_available():
     print ("GPU and CUDA detected and will be used")
@@ -46,7 +47,7 @@ for infile in tqdm(membrane_list, desc = "Input Images Processed"):
     membrane_img= cv2.imread(infile_membrane_channel_path,cv_mode)
     manual_mask= np.zeros(mass_img.shape[0:2]).astype(np.uint16)
 
-    segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,"","","","",model_match_threshold,is_imc,is_qif)
+    segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,"","","","",model_match_threshold,is_imc,is_qif,use_gpu)
     
     red_green_image = segmentor_obj.red_green_image_maker()   
     cv2.imwrite(outfile_path_red_green,red_green_image) 

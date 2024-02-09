@@ -20,12 +20,14 @@ import torch
 def get_stardist_model(model_name='stardist_model',directory= './models/model_fiber_segmentation/'):
     model = StarDist2D(None, name=model_name, basedir=directory)
     return model
-def get_cellpose_model_imc(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc', use_gpu= torch.cuda. is_available()):
-    model = cellpose_models.CellposeModel(gpu=use_gpu, 
+def get_cellpose_model_imc(use_gpu,model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc' ):
+    gpu= (use_gpu & torch.cuda. is_available())
+    model = cellpose_models.CellposeModel(gpu=gpu, 
                              pretrained_model=model_path)
     return model
-def get_cellpose_model_qif(model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc', use_gpu= torch.cuda. is_available()):
-    model = cellpose_models.CellposeModel(gpu=use_gpu, 
+def get_cellpose_model_qif(use_gpu,model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc' ):
+    gpu= (use_gpu & torch.cuda. is_available())
+    model = cellpose_models.CellposeModel(gpu=gpu, 
                              pretrained_model=model_path)
     return model
 def stardist_predict(img_BGR):
@@ -64,14 +66,14 @@ def cellpose_channel_arrangement(Channel_to_use_for_segmentation,Second_segmenta
     
     return chan, chan2
 
-def cellpose_predict(img_BGR,is_imc,is_qif,model_match_threshold, primary_channel='Green', secondary_channel='Red',cell_prob_thershold=0.0):
+def cellpose_predict(img_BGR,is_imc,is_qif,model_match_threshold,use_gpu, primary_channel='Green', secondary_channel='Red',cell_prob_thershold=0.0):
     
     if is_imc:
         fiber_diameter=65
-        model= get_cellpose_model_imc()
+        model= get_cellpose_model_imc(use_gpu)
     if is_qif:
         fiber_diameter=200
-        model= get_cellpose_model_qif()
+        model= get_cellpose_model_qif(use_gpu)
         
     flow_style_threshold = (31.0 - model_match_threshold) / 10.
            

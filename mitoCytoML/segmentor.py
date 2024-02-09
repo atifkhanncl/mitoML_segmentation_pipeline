@@ -15,7 +15,7 @@ class segmentor:
             
     """
 
-    def __init__(self,membrane_channel, mass_channel,manual_mask, red_green_file_path, fiber_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path,model_match_threshold,is_imc,is_qif):
+    def __init__(self,membrane_channel, mass_channel,manual_mask, red_green_file_path, fiber_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path,model_match_threshold,is_imc,is_qif,use_gpu):
         
         """
          Constructs all the necessary attributes to create a segmentor.
@@ -34,6 +34,7 @@ class segmentor:
         self.is_imc= is_imc
         self.is_qif= is_qif
         self.model_match_threshold= model_match_threshold
+        self.use_gpu= use_gpu
         self.red_green_file_path = red_green_file_path
         self.fiber_mask_path = fiber_mask_path
         #self.stardist_mask_path= stardist_mask_path
@@ -114,7 +115,7 @@ class segmentor:
                 
             else:
                 #self.fiber_mask_stardist, details = stardist_predict(self.red_green_image)
-                self.fiber_mask_cellpose = cellpose_predict(self.red_green_image,self.is_imc,self.is_qif,self.model_match_threshold)
+                self.fiber_mask_cellpose = cellpose_predict(self.red_green_image,self.is_imc,self.is_qif,self.model_match_threshold, self.use_gpu)
                 self.fiber_mask = self.fiber_mask_cellpose
                 #segmentor_model_to_use= input("By default the pipeline uses cellpose to segment myofibres if this ok press enter, otherwise to use stardist press 'S' and enter")
                 #if segmentor_model_to_use.casefold() == 'S' :

@@ -9,11 +9,8 @@ import torch
 data_obj = data.data_obj ()
 data_obj.create_dir_structure()
 model_match_threshold=27
+use_gpu= True
 
-if torch.cuda. is_available():
-    print ("GPU and CUDA detected and will be used")
-else:
-    print ("GPU and CUDA not detected and CPU will be used")
     
 response_1= input("Types of images: For QIF press'Q' and enter or For IMC press 'I' and enter: ")
 if response_1 =='Q' or 'q':
@@ -64,7 +61,7 @@ if response_3 == 'y' or 'Y':
         if manual_mask is None:
             manual_mask= np.zeros(mass_img.shape[0:2]).astype(np.uint16)
         
-        segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,outfile_path_NTM_mask,outfile_path_FAM_mask,outfile_path_FR_mask,outfile_path_final_segmented_mask,model_match_threshold,is_imc,is_qif)
+        segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,outfile_path_NTM_mask,outfile_path_FAM_mask,outfile_path_FR_mask,outfile_path_final_segmented_mask,model_match_threshold,is_imc,is_qif,use_gpu)
         
         red_green_image = segmentor_obj.red_green_image_maker()   
         cv2.imwrite(outfile_path_red_green,red_green_image) 
