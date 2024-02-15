@@ -340,7 +340,7 @@ def ind_fiber_image_maker(rawim, maskim):
             #img_path = os.path.join(out_dir,filename+'_'+str(colour)+ '.tiff')
             #fibim.save(img_path)
     return ind_fibers_list, unique_colours_list
-def memb_mass_cal(img,contour,element_size=2): # 2 for IMC and 6 for IF
+def memb_mass_cal(img,contour,element_size): # 2 for IMC and 6 for IF
     element = cv2.getStructuringElement(cv2.MORPH_RECT, (2 * element_size + 1, 2 * element_size + 1),
                                         (element_size, element_size))
     

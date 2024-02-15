@@ -17,10 +17,12 @@ if response_1 =='Q' or 'q':
     is_qif= True
     is_imc= False
     cv_mode= 0
+    e_size=6
 if response_1 == 'I' or 'i':
     is_imc= True
     is_qif= False
     cv_mode= -1
+    e_size=2
 if response_1 not in [ 'Q', 'q' ,'I' ,'i']:
     print('incorrect option selected '+response_1+' , start again')
 
@@ -61,7 +63,7 @@ if response_3 == 'y' or 'Y':
         if manual_mask is None:
             manual_mask= np.zeros(mass_img.shape[0:2]).astype(np.uint16)
         
-        segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,outfile_path_NTM_mask,outfile_path_FAM_mask,outfile_path_FR_mask,outfile_path_final_segmented_mask,model_match_threshold,is_imc,is_qif,use_gpu)
+        segmentor_obj = segmentor.segmentor(membrane_img, mass_img,manual_mask,outfile_path_red_green,outfile_path_raw_fiber_segmentation,outfile_path_NTM_mask,outfile_path_FAM_mask,outfile_path_FR_mask,outfile_path_final_segmented_mask,model_match_threshold,is_imc,is_qif,use_gpu,e_size)
         
         red_green_image = segmentor_obj.red_green_image_maker()   
         cv2.imwrite(outfile_path_red_green,red_green_image) 

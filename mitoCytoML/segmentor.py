@@ -15,7 +15,7 @@ class segmentor:
             
     """
 
-    def __init__(self,membrane_channel, mass_channel,manual_mask, red_green_file_path, fiber_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path,model_match_threshold,is_imc,is_qif,use_gpu):
+    def __init__(self,membrane_channel, mass_channel,manual_mask, red_green_file_path, fiber_mask_path, NTM_mask_path, FAM_mask_path, FR_mask_path, final_mask_path,model_match_threshold,is_imc,is_qif,use_gpu,e_size):
         
         """
          Constructs all the necessary attributes to create a segmentor.
@@ -33,6 +33,7 @@ class segmentor:
         self.c_limit_mass = 0.4
         self.is_imc= is_imc
         self.is_qif= is_qif
+        self.element_size = e_size
         self.model_match_threshold= model_match_threshold
         self.use_gpu= use_gpu
         self.red_green_file_path = red_green_file_path
@@ -278,7 +279,7 @@ class segmentor:
             self.red_green_image = self.red_green_image_maker()     
         if self.fiber_mask is None:
             self.fiber_mask = self.fiber_segmentator() 
-        self.quality_metrics= get_quality_metrics(self.red_green_image,self.manual_mask, self.fiber_mask, element_size=2 )
+        self.quality_metrics= get_quality_metrics(self.red_green_image,self.manual_mask, self.fiber_mask, element_size=self.element_size )
        
         return self.quality_metrics
     

@@ -20,12 +20,12 @@ import torch
 def get_stardist_model(model_name='stardist_model',directory= './models/model_fiber_segmentation/'):
     model = StarDist2D(None, name=model_name, basedir=directory)
     return model
-def get_cellpose_model_imc(use_gpu,model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc' ):
+def get_cellpose_model_imc(use_gpu,model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc_v2' ):
     gpu= (use_gpu & torch.cuda. is_available())
     model = cellpose_models.CellposeModel(gpu=gpu, 
                              pretrained_model=model_path)
     return model
-def get_cellpose_model_qif(use_gpu,model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc' ):
+def get_cellpose_model_qif(use_gpu,model_path='./models/model_fiber_segmentation/cellpose_model/cellpose_model_imc_v2' ):
     gpu= (use_gpu & torch.cuda. is_available())
     model = cellpose_models.CellposeModel(gpu=gpu, 
                              pretrained_model=model_path)
@@ -253,6 +253,7 @@ def get_quality_metrics(img,mask_gt, mask_to_assess, element_size=2 ): # element
     as_memb_vals=[]
     as_mass_vals=[]
     IoUs=[]
+    detected_fibres = 0
     for i, cont_gt in enumerate(contours_GT):
         
         for j, cont_as in enumerate(contours_Assess):
@@ -268,8 +269,10 @@ def get_quality_metrics(img,mask_gt, mask_to_assess, element_size=2 ): # element
                 
                 IoU = IoU_two_contours(mask_gt.shape[0:2],contours_GT[i], contours_Assess[j])
                 IoUs.append(IoU)
+                detected_fibres+=1
                 
                 break
+    perc_detected_fibres= (detected_fibres/len(contours_GT))*100
     IoUs= np.asarray(IoUs, dtype=np.float16)
     r_memb= np.corrcoef(gt_memb_vals, as_memb_vals)[1,0]
     r_mass= np.corrcoef(gt_mass_vals, as_mass_vals)[1,0]
@@ -280,7 +283,7 @@ def get_quality_metrics(img,mask_gt, mask_to_assess, element_size=2 ): # element
     IoU_accuracy_at_90= (((IoUs >0.9).sum())/len(IoUs))*100
     IoU_accuracy_at_95= (((IoUs >0.95).sum())/len(IoUs))*100
     
-    return (r_memb,r_mass, IoU_mean,IoU_accuracy_at_80,IoU_accuracy_at_90,IoU_accuracy_at_95 )
+    return (r_memb,r_mass, IoU_mean,IoU_accuracy_at_80,IoU_accuracy_at_90,IoU_accuracy_at_95,perc_detected_fibres )
     
     
                 
