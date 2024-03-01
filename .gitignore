@@ -47,3 +47,7 @@ input/raw_images/membrane_channel_images/MCD001_MDP_C09-10_B_A0_MP_MF0_S00_RR006
 *.pyc
 output/*
 mitocytoML/__pycache__/*
+raw_segmented_masks_comparison/M1180 OXPHOS_v2.tiff
+raw_segmented_masks_comparison/M1180 NPC.tiff
+raw_segmented_masks_comparison/M1180 NPC_v2.tiff
+raw_segmented_masks_comparison/M1180 OXPHOS.tiff

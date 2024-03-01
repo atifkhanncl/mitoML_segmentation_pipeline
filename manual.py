@@ -11,7 +11,7 @@ data_obj.create_dir_structure()
 model_match_threshold=27
 use_gpu= True
 
-if torch.cuda. is_available():
+if torch.cuda. is_available() and use_gpu:
     print ("GPU and CUDA detected and will be used")
 else:
     print ("GPU and CUDA not detected and CPU will be used")
