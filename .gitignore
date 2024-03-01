@@ -51,3 +51,4 @@ raw_segmented_masks_comparison/M1180 OXPHOS_v2.tiff
 raw_segmented_masks_comparison/M1180 NPC.tiff
 raw_segmented_masks_comparison/M1180 NPC_v2.tiff
 raw_segmented_masks_comparison/M1180 OXPHOS.tiff
+models/model_fiber_segmentation/cellpose_model/cellpose_model_imc_v2_ATIF
