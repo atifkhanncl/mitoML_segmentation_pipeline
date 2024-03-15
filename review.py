@@ -18,8 +18,19 @@ if fname.isdigit() and int(fname)<len(allstems):
     fname = allstems[int(fname)]
 else:
     print("Bad section name, try again...")
-fname= fname+".tiff"
+key = input("\nIs this an IMC section (y/n, then press enter)?")
+if key =="y":
+    IMC = True
+elif key =="n":
+    IMC = False
+else:
+    print("Section type response does not make sense...")
+    
+fname = fname+".tiff"
 
+# Set areamin & areamax to -1 to disable filtering objects by area
+areamin, areamax = 210, 27000 # Taken from Atif's NTM filter
+IF20x = 0.325*0.325 #um2 per pixel in IF sections imaged at 20x magnification?
 
 viewer = napari.Viewer()
 
@@ -177,8 +188,13 @@ def clear_layers(viewer):
     viewer.layers.clear() 
     
 print("Reviewing ",fname)
-# Set areamin & areamax to -1 to disable filtering objects by area
-load_all_layers(viewer,fname,areamin=210,areamax=27000)  
+
+if IMC:
+    # Assume 1px = 1um2
+    load_all_layers(viewer,fname,areamin=areamin,areamax=areamax)
+else:
+    # Convert pixels to um2
+    load_all_layers(viewer,fname,areamin=areamin/IF20x, areamax=areamax/IF20x)
 
 napari.run()
 
