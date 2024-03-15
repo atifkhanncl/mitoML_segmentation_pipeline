@@ -20,9 +20,9 @@ else:
     print("Bad section name, try again...")
 key = input("\nIs this an IMC section (y/n, then press enter)?")
 if key =="y":
-    IMC = True
+    isIMC = True
 elif key =="n":
-    IMC = False
+    isIMC = False
 else:
     print("Section type response does not make sense...")
     
@@ -189,7 +189,7 @@ def clear_layers(viewer):
     
 print("Reviewing ",fname)
 
-if IMC:
+if isIMC:
     # Assume 1px = 1um2
     load_all_layers(viewer,fname,areamin=areamin,areamax=areamax)
 else:
