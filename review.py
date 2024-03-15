@@ -24,7 +24,7 @@ fname= fname+".tiff"
 viewer = napari.Viewer()
 
 
-def load_all_layers(viewer,fname):
+def load_all_layers(viewer,fname,areamin=-1,areamax=-1):
 
     if os.path.isfile(os.path.join(NTM_masks_dir,fname)):
         NTM_fiber_ids= get_unique_labels_in_mask(read_image_io(os.path.join(NTM_masks_dir,fname)))
@@ -41,6 +41,14 @@ def load_all_layers(viewer,fname):
     all_fiber_ids_to_remove= all_fiber_ids_to_remove= np.union1d(np.union1d(NTM_fiber_ids , FAM_fiber_ids ), FR_fiber_ids) # Could have just used python sets here? 
     
     raw_mask= io.imread(os.path.join(raw_segmented_masks_dir,fname))
+    if areamin>=0 and areamax > areamin:
+        bc = np.bincount(raw_mask.flatten())
+        fibcols = [i for i,count in enumerate(bc) if (count>areamin and count<areamax)]
+        remove = np.logical_not(np.isin(raw_mask,fibcols))
+        raw_mask[remove]=0
+    else:
+        print("Not filtering any objects from raw mask")        
+
     if os.path.isfile(os.path.join(FR_masks_dir,fname)):
         FR_mask= read_image_io(os.path.join(FR_masks_dir,fname))
     NTM_mask= mask_selected_fibers_array_retain (read_image_io(os.path.join(raw_segmented_masks_dir,fname)), NTM_fiber_ids)
@@ -169,7 +177,8 @@ def clear_layers(viewer):
     viewer.layers.clear() 
     
 print("Reviewing ",fname)
-load_all_layers(viewer,fname)    
+# Set areamin & areamax to -1 to disable filtering objects by area
+load_all_layers(viewer,fname,areamin=210,areamax=27000)  
 
 napari.run()
 
