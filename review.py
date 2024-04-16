@@ -66,7 +66,7 @@ def load_all_layers(viewer,fname,areamin=-1,areamax=-1):
     FAM_mask= mask_selected_fibers_array_retain (read_image_io(os.path.join(raw_segmented_masks_dir,fname)), FAM_fiber_ids)
     final_mask= mask_selected_fibers_array_remove (read_image_io(os.path.join(raw_segmented_masks_dir,fname)), all_fiber_ids_to_remove)
     
-    viewer.open(os.path.join(red_green_images_dir,fname), layer_type='image', multiscale=False, rgb=True,name="red_green")   
+    viewer.open(os.path.join(red_green_images_dir,fname), layer_type="image", multiscale=False, rgb=True,name="red_green", visible=False)   
     if len(all_fiber_ids_to_remove)!=0:
         layer_final= viewer.add_labels(final_mask, multiscale=False,name="final", visible=False)
     if os.path.isfile(os.path.join(FAM_masks_dir,fname)):
@@ -74,8 +74,16 @@ def load_all_layers(viewer,fname,areamin=-1,areamax=-1):
     if os.path.isfile(os.path.join(NTM_masks_dir,fname)):
         layer_NTM= viewer.add_labels(NTM_mask, multiscale=False,name="NTM",visible=False)
     if os.path.isfile(os.path.join(FR_masks_dir,fname)):
-        layer_FR= viewer.add_labels(FR_mask, multiscale=False,name="Folded_Regions",visible=False)
-    layer_raw_segmentation= viewer.add_labels(raw_mask, multiscale=False,name="Segmented_Fibres",visible=False)
+        layer_FR= viewer.add_labels(FR_mask, multiscale=False,name="Folded_Regions",visible=False),
+
+    dup_RG=(viewer.layers['red_green']).data
+    membrane_chan=dup_RG[:, :, 0]
+    cytoplasm_chan=dup_RG[:, :, 1]
+    viewer.add_image(cytoplasm_chan, multiscale=False, rgb=False, colormap="green")
+    viewer.add_image(membrane_chan, multiscale=False, rgb=False, blending = "additive", colormap="red")
+    
+    layer_raw_segmentation=viewer.add_labels(raw_mask, multiscale=False,name="Segmented_Fibres",
+                                              blending = "translucent",opacity=0.7,visible=True)
 
     if os.path.isfile(os.path.join(NTM_masks_dir,fname)):
         @layer_NTM.mouse_double_click_callbacks.append
