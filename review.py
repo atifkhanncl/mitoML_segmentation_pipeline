@@ -74,7 +74,7 @@ def load_all_layers(viewer,fname,areamin=-1,areamax=-1):
     if os.path.isfile(os.path.join(NTM_masks_dir,fname)):
         layer_NTM= viewer.add_labels(NTM_mask, multiscale=False,name="NTM",visible=False)
     if os.path.isfile(os.path.join(FR_masks_dir,fname)):
-        layer_FR= viewer.add_labels(FR_mask, multiscale=False,name="Folded_Regions",visible=False),
+        layer_FR= viewer.add_labels(FR_mask, multiscale=False,name="Folded_Regions",visible=False)
 
     dup_RG=(viewer.layers['red_green']).data
     membrane_chan=dup_RG[:, :, 0]
