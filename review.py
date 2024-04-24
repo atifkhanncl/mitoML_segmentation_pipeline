@@ -5,6 +5,7 @@ import glob
 import os
 import numpy as np
 import pathlib
+from skimage import measure
 
 np.random.seed(1)
 
@@ -162,8 +163,13 @@ def load_all_layers(viewer,fname,areamin=-1,areamax=-1):
             else:
                 print(f'double-clicked at {coords} on background which is ignored')
 
+def guarantee_unique_labels(arr):
+    binim = arr>0
+    labeled_image, count = measure.label(arr,connectivity=2,return_num=True)
+    # Hmmm, number of objects found by CCA does not correspond to number of colours
+    # Maybe need to use openCV here
+    return
 
-                
 @viewer.bind_key('r')
 def reset_layer(viewer):
     layer_data= list(viewer.layers.selection)[0].data
