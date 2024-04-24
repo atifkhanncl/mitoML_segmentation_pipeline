@@ -51,7 +51,8 @@ def load_all_layers(viewer,fname,areamin=-1,areamax=-1):
         FR_fiber_ids=[]
     all_fiber_ids_to_remove= all_fiber_ids_to_remove= np.union1d(np.union1d(NTM_fiber_ids , FAM_fiber_ids ), FR_fiber_ids) # Could have just used python sets here? 
     
-    raw_mask= io.imread(os.path.join(raw_segmented_masks_dir,fname))
+    totally_raw_mask= io.imread(os.path.join(raw_segmented_masks_dir,fname))
+    raw_mask = totally_raw_mask.copy()
     if areamin>=0 and areamax > areamin:
         bc = np.bincount(raw_mask.flatten())
         fibcols = [i for i,count in enumerate(bc) if (count>areamin and count<areamax)]
@@ -109,7 +110,7 @@ def load_all_layers(viewer,fname,areamin=-1,areamax=-1):
                     layer.data = data
 
                 else:
-                    print(f'clicked at {coords} on background which is ignored')   
+                    print(f'double-clicked at {coords} on background which is ignored')   
 
     if os.path.isfile(os.path.join(FAM_masks_dir,fname)):
         @layer_FAM.mouse_double_click_callbacks.append
@@ -135,7 +136,7 @@ def load_all_layers(viewer,fname,areamin=-1,areamax=-1):
                     layer.data = data
 
                 else:
-                    print(f'clicked at {coords} on background which is ignored')
+                    print(f'double-clicked at {coords} on background which is ignored')
 
     @layer_raw_segmentation.mouse_double_click_callbacks.append
     def update_required_layers(layer, event):
@@ -150,17 +151,16 @@ def load_all_layers(viewer,fname,areamin=-1,areamax=-1):
             layer.data = data
 
         else:
-            data_raw = layer_raw_segmentation.data
-            val_raw= data_raw[coords[0],coords[1]]
+            val_raw= totally_raw_mask[coords[0],coords[1]]
             if val_raw is None:
                 return
             if val_raw !=0:
                 data = layer.data
-                data[data_raw==val_raw] = val_raw
+                data[totally_raw_mask==val_raw] = val_raw
                 layer.data = data
 
             else:
-                print(f'clicked at {coords} on background which is ignored')
+                print(f'double-clicked at {coords} on background which is ignored')
 
 
                 

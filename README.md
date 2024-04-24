@@ -33,13 +33,14 @@ Step 3: follow the prompts on the terminal.
 
 Step 4: At completion. Find all masks in output folder. If you're not happy with any mask, please see below section.
 
+Alternatively, run manual.py to get only the raw segmentation maps.
+
 ## Reviewing mitocytoML outputs
 You can review and correct all generated masks using review.py
 
-
 Step 1: using terminal navigate to repo and and type 'python review.py'
 
-Step 2: Type filename and enter. This will open a napari session with 6 layers with image on ‘view’ mode and all masks on hide mode
+Step 2: Type filename (or file number) and press enter. This will open a napari session with all available layers (up to 6 layers, depending on type of prediction) with image on ‘view’ mode and all masks on hide mode
 
 Step 3: Review ‘Segmented_Fibres’ layer
 -  1.  You can change borders of existing fibres by selecting fiber id and using brush or eraser tool
@@ -65,6 +66,7 @@ Step 6: Review ‘FAMs’ layer
 Step 7: Review ‘final’ layer
 -  Upon reviewing step 1-6, if you're happy with all layers please press ‘s’ key. This will save all corrections and compute new ‘final’ mask.
        
+Note that at any point you can double click on a segmented fibre to remove it.  Also, you can double click on a space that was once a segemented fibre to restore the segmentation.  If the raw segmentation layer is active, then double clicking on an empty space will even restore fibre segmentations that were rejected by the fibre area filter.
 
 ## Segmenting fibers
 
