@@ -26,6 +26,7 @@ pip install -r requirements.txt
 
 ## Using the mitocytoML
 Step 1: using terminal navigate to repo and and type 'python main.py'
+NOTE: Alternatively, run manual.py to get only the raw segmentation maps.
 
 Step 2: it will prompt 'Please place required raw images into the respective folder then press 'y' and enter'. Please place raw tiff images of memebrane and mass channels in respective folders within input. Also, if you want to know the quality of annotations then please manually annotate few myofibres and place the mask in 'manual_sample_masks' within input folder.
 
@@ -33,7 +34,6 @@ Step 3: follow the prompts on the terminal.
 
 Step 4: At completion. Find all masks in output folder. If you're not happy with any mask, please see below section.
 
-Alternatively, run manual.py to get only the raw segmentation maps.
 
 ## Reviewing mitocytoML outputs
 You can review and correct all generated masks using review.py
