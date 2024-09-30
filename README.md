@@ -1,9 +1,9 @@
-# mitoML_segmentation_pipeline
-Machine learning pipeline to segment muscle fibers from IMC and IF images 
+# myocytoML: An automatic myofibre segmentation pipeline
+Machine learning pipeline to segment muscle fibers in IMC and IF images 
 
 
 
-# Using mitocytoML
+# Using myocytoML
 
 ## Getting Started
 
@@ -24,7 +24,7 @@ pip install -r requirements.txt
 
 **Note: the requirements file contains all the dependencies needed, and it works well when the version of python is in the mentioned range.**
 
-## Using the mitocytoML
+## Using the myocytoML
 Step 1: using terminal navigate to repo and and type 'python main.py'
 NOTE: Alternatively, run manual.py to get only the raw segmentation maps.
 
@@ -35,7 +35,7 @@ Step 3: follow the prompts on the terminal.
 Step 4: At completion. Find all masks in output folder. If you're not happy with any mask, please see below section.
 
 
-## Reviewing mitocytoML outputs
+## Reviewing myocytoML outputs
 You can review and correct all generated masks using review.py
 
 Step 1: using terminal navigate to repo and and type 'python review.py'
@@ -70,10 +70,10 @@ Note that at any point you can double click on a segmented fibre to remove it.  
 
 ## Segmenting fibers
 
-mitocytoML can be utilised to segment muscle fibers from IMC and IF image data either by just running 'main.py' or with 3 simple steps:
+myocytoML can be utilised to segment muscle fibers from IMC and IF image data either by just running 'main.py' or with 3 simple steps:
 
 1) Place raw images representing mass and membrane of the fibers in respective folders within 'raw_images' folder. 
-2) Load the mitocytoML `segmentor` and 'data' objects
+2) Load the myocytoML `segmentor` and 'data' objects
 3) Invoke `data.data_obj()` to load data object and 'segmentor.segmentor()' to access all segmentor functions and attributes
 
 
@@ -96,7 +96,7 @@ In order to use a GPU:
 
 we encourage you use [napari] (https://napari.org/stable/) to view results.
 
-### mitoCytoML Fiber Segmentor Example
+### myocytoML Fiber Segmentor Example
 
 Load in the segmentor object
 ```python
@@ -126,7 +126,7 @@ img_segmentor.non_analysable_fibers_remover()
 
 
 ## Contributing:
-mitocytoML is an open source codebase.
+myocytoML is an open source codebase.
 
 #### Linting
 This library uses `flake8` for linting. Please identify formatting errors in your code **before** pushing by running the following 
